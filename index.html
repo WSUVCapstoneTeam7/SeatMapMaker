@@ -1,0 +1,119 @@
+<html xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+    <head>
+        <!-- <script src="jquery-3.2.1.min.js"></script> -->
+        <script src="fabric.js"></script>
+        <script src="vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.4"></script>
+        
+
+        <meta charset="utf-8">
+        <title>Testing</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        
+        <!--Ty CSS-->
+        <link rel="stylesheet" type="text/css" href="styles.css"/>
+        
+        <style type="text/css">
+            /* body {
+                margin: 0;
+            }
+    
+            canvas {
+                border: 1px solid black;
+            } */
+        </style>
+    </head>
+    
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="row">
+                <img class="navbar-brand" src="res\logo2.png" alt="logo">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item"><a href="#" class="nav-link">START</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div id = "wrapper">
+            <div id = "vue-app" v-on:click='preventDropmenuClosing' class = "container-fluid">
+                <div class="dropdown">
+                    <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Toolbox
+                    </button>
+                    <div class="dropdown-menu">
+                        <app-toolbar></app-toolbar>
+                        <get-data></get-data>
+                    </div>
+                </div>
+            </div> 
+            <div id="canvas">
+                <canvas id="c" width="1920" height="1080"></canvas>
+            </div>
+        </div>
+      
+    </body>
+
+    <template id="app-toolbar" >
+        <div >
+            <br>
+            <!-- each button tag has a v-on directive that leads to a different listener method -->
+            <a v-on:click='setAddSeating' class="dropdown-item">Add Seating</a>
+            <add-form></add-form>
+            <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
+            <edit-form></edit-form>
+            <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
+            <br>
+        </div>
+    </template>
+
+    <template id = "add-form">
+        <!-- v-show directive makes div invisible if "showSeatingForm" is false -->
+        <div v-show="showAddSeatForm">
+            <form>
+                <!-- v-model directive binds data from field to data in Vue instance -->
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
+                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns"></input>
+                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows"></input>
+                <br>
+            </form>
+            <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
+            <button v-on:click ="submitSeatingData">Submit</button>
+            <!-- Debugging to see that the form toggle flag is being set -->
+        <p v-show="false"><span>{{showAddSeatForm}}</span></p>
+        </div>        
+    </template>
+
+    <template id = "edit-form">
+        <!-- v-show directive makes div invisible if "showEditSeatingForm" is false -->
+        <div v-show="showEditSeatingForm">
+            <form>
+                Edit Seating <br>
+                Name: <input type="text" id="newName"></input><br>
+                Columns: <input type="text" id="newCols" style="width:30"></input>
+                Rows: <input type="text" id="newRows" style="width:30"></input>
+                <br>
+            </form> 
+            <!-- <button v-on:click ="submitEditSeating">Submit changes</button> -->
+        </div>
+    </template>
+
+    <template id = "get-data">
+        <div>
+            <button v-on:click = "Load Map">GetData</button>
+            <br>
+            <button v-on:click = "Save Map">postData</button>
+            <!-- <a v-for = "(blog,index) in blogs" v-bind:key ="index">{{blog.title}}</a> -->
+        </div>
+    </template>
+    <script src="main.js"></script>
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+</html>
+
+

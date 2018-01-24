@@ -1,0 +1,54 @@
+html,body {
+    height:98vh;
+    min-width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+
+#wrapper {
+    height: calc(100vh - 55px);
+}
+
+#sidebar {
+    float: left;
+    height: calc(100vh - 55px);
+    min-width: 200px;
+    align-items: center;
+}
+
+#canvas {
+    float: left;
+    width: calc(100vw - 200px);
+    height: calc(100vh - 55px);
+}
+
+.navbar {
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+    align-content: flex-start;
+    /*background: darkgrey;*/
+    height: 50px;
+}
+
+.btn {
+    background-color: #3B1C4A;
+    color: white;
+    -webkit-box-shadow: 1px 3px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 3px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 1px 3px 5px 0px rgba(0,0,0,0.75);
+}
+
+.container-fluid {
+    padding: 0;
+    margin: 0;
+
+}
+
+.container-fluid .btn-group-vertical{
+    background: darkgrey;
+    max-width: 100px;
+}
+.container-fluid .container-fluid{
+    background: lightslategray;
+}
