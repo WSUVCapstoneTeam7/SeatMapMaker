@@ -44,52 +44,29 @@
         <div id = "wrapper">
             <div id = "vue-app" class = "container-fluid">
                 <drop-down-menu></drop-down-menu>
-                <!-- <div class="dropdown">
-                    <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Toolbox
-                    </button>
-                    <div class="dropdown-menu">
-                        <app-toolbar></app-toolbar>
-                    </div>
-                </div> -->
             </div> 
             <div id="canvas">
                 <canvas id="c" width="1920" height="1080"></canvas>
             </div>
-        </div>
-      
+        </div> 
     </body>
 
     <template id = "drop-down-menu">
-        <div class="dropdown" v-on:click = "preventDropmenuClosing">
-            <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div class="dropdown"  v-on:click = "preventDropmenuClosing" >
+            <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" v-bind:aria-expanded="false">
                 Toolbox
             </button>
             <div class="dropdown-menu">
-                <app-toolbar></app-toolbar>
+                <br>
+                <!-- each button tag has a v-on directive that leads to a different listener method -->
+                <button v-on:click='setAddSeating' class="dropdown-item">Add Seating</button>
+                <add-form></add-form>
+                <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
+                <edit-form></edit-form>
+                <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
+                <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
+                <br>
             </div>
-        </div>
-    </template>
-
-    <template id="app-toolbar" >
-        <div >
-            <br>
-            <!-- each button tag has a v-on directive that leads to a different listener method -->
-            <button v-on:click='setAddSeating' class="dropdown-item">Add Seating</button>
-            <add-form></add-form>
-            <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
-            <edit-form></edit-form>
-            <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
-            <download-button ></download-button>
-            <br>
-        </div>
-    </template>
-
-    <template id = "download-button">
-        <div>
-            <button class="dropdown-item" v-on:click = 'downloadStuff'>
-                Download
-            </button>
         </div>
     </template>
 
@@ -123,10 +100,7 @@
             <!-- <button v-on:click ="submitEditSeating">Submit changes</button> -->
         </div>
     </template>
-
     <script src="main.js"></script>
-
-
 </html>
 
 
