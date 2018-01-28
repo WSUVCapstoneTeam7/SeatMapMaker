@@ -7,12 +7,15 @@
         
 
         <meta charset="utf-8">
-        <title>Testing</title>
+        <title>Seat-Map-Maker</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-        
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
         <!--Ty CSS-->
         <link rel="stylesheet" type="text/css" href="styles.css"/>
         
@@ -32,22 +35,22 @@
             <div class="row">
                 <img class="navbar-brand" src="res\logo2.png" alt="logo">
                 <ul class="nav navbar-nav">
-                    <li class="nav-item"><a href="#" class="nav-link">START</a></li>
+                    <!-- <li class="nav-item"><a href="#" class="nav-link">START</a></li> -->
                 </ul>
             </div>
         </nav>
 
         <div id = "wrapper">
-            <div id = "vue-app" v-on:click='preventDropmenuClosing' class = "container-fluid">
-                <div class="dropdown">
+            <div id = "vue-app" class = "container-fluid">
+                <drop-down-menu></drop-down-menu>
+                <!-- <div class="dropdown">
                     <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Toolbox
                     </button>
                     <div class="dropdown-menu">
                         <app-toolbar></app-toolbar>
-                        <get-data></get-data>
                     </div>
-                </div>
+                </div> -->
             </div> 
             <div id="canvas">
                 <canvas id="c" width="1920" height="1080"></canvas>
@@ -56,6 +59,17 @@
       
     </body>
 
+    <template id = "drop-down-menu">
+        <div class="dropdown" v-on:click = "preventDropmenuClosing">
+            <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Toolbox
+            </button>
+            <div class="dropdown-menu">
+                <app-toolbar></app-toolbar>
+            </div>
+        </div>
+    </template>
+    
     <template id="app-toolbar" >
         <div >
             <br>
@@ -100,20 +114,9 @@
         </div>
     </template>
 
-    <template id = "get-data">
-        <div>
-            <button v-on:click = "Load Map">GetData</button>
-            <br>
-            <button v-on:click = "Save Map">postData</button>
-            <!-- <a v-for = "(blog,index) in blogs" v-bind:key ="index">{{blog.title}}</a> -->
-        </div>
-    </template>
     <script src="main.js"></script>
 
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
 </html>
 
 
