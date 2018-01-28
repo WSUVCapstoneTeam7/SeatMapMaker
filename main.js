@@ -228,22 +228,13 @@ var vm = new Vue({
             fabCanvas.remove(seatingToDelete);
             fabCanvas.renderAll();
         },
-        post:function(){
-            this.$http.post("https://jsonplaceholder.typicode.com/posts",{
-                title: this.blog.title,
-                body: this.blog.content,
-                userId:1
-            }).then(function(data){
-                console.log(data);
-                this.submitted = true;
-            });
-        }
     },
     created(){
         // listens for a signal saying to create a new seating section
         bus.$on('sigMakeSeating', (posX, posY, cols, rows, name)=>{
             console.log(fabCanvas);
             this.makeSeating(posX, posY, cols, rows, name);
+
         });
 
         // listens for a signal saying to delete the seating
@@ -251,5 +242,9 @@ var vm = new Vue({
             this.deleteSeating();
         });
 
+        // loads a canvas instance from the data store in seat-map.json
+        $.getJSON( "./seat-map.json", function( data ) {
+            fabCanvas.loadFromJSON(data);
+          });
     }
 });
