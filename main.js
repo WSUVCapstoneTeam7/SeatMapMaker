@@ -7,31 +7,6 @@ fabCanvas.setHeight( window.innerHeight);
 
 var bus = new Vue();
 
-Vue.component('app-toolbar',{
-    template: '#app-toolbar',
-    data(){
-        return{};
-    },
-    methods:{
-        setAddSeating(){ 
-            // emits a bus signal to toggle the add seating form.
-            bus.$emit('sigAddSeatFormOn');
-            bus.$emit('sigEditSeatFormOff');
-        },
-        setDeleteSeating(){
-            // emits a bus signal to toggle both forms off
-            bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigEditSeatFormOff');
-            // signal the seating to be deleted
-            bus.$emit('sigDeleteSeating');
-        },
-        setEditTool(){
-            // emits a bus signal to toggle the edit seating form
-            bus.$emit('sigEditSeatFormOn');
-            bus.$emit('sigAddSeatFormOff');
-        },
-    }
-});
 
 Vue.component('add-form',{
     template: '#add-form',
@@ -64,14 +39,13 @@ Vue.component('add-form',{
         bus.$on('sigAddSeatFormOn', ()=>{
             this.showAddSeatForm = true;
         });
-
         // a bus listener for toggling the visibility of both forms when 
         // the delete seating signal is received.
         bus.$on('sigAddSeatFormOff',()=>{
             this.showAddSeatForm = false;
         });
     }, 
-})
+});
 
 Vue.component('edit-form',{
     template: '#edit-form',
