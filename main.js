@@ -1,14 +1,16 @@
-var fabCanvas = new fabric.Canvas('c');
+/*jshint esversion: 6 */
+const fabCanvas = new fabric.Canvas('c');
 
 fabCanvas.setWidth( window.innerWidth );
-fabCanvas.setHeight( window.innerHeight*.7 );
+fabCanvas.setHeight( window.innerHeight);
+
 
 var bus = new Vue();
 
 Vue.component('app-toolbar',{
     template: '#app-toolbar',
     data(){
-        return{}
+        return{};
     },
     methods:{
         setAddSeating(){ 
@@ -29,7 +31,7 @@ Vue.component('app-toolbar',{
             bus.$emit('sigAddSeatFormOff');
         },
     }
-})
+});
 
 Vue.component('add-form',{
     template: '#add-form',
@@ -39,7 +41,7 @@ Vue.component('add-form',{
             columns: 5,
             rows: 5,
             showAddSeatForm: false,
-        }
+        };
     },
     methods:{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
@@ -61,13 +63,13 @@ Vue.component('add-form',{
         // a "bus stop" signal listener for toggling the visibility of the add seating form.
         bus.$on('sigAddSeatFormOn', ()=>{
             this.showAddSeatForm = true;
-        })
+        });
 
         // a bus listener for toggling the visibility of both forms when 
         // the delete seating signal is received.
         bus.$on('sigAddSeatFormOff',()=>{
             this.showAddSeatForm = false;
-        })
+        });
     }, 
 })
 
@@ -80,50 +82,71 @@ Vue.component('edit-form',{
             rows: 5,
             cols: 5,
             showEditSeatingForm: false
-        }
+        };
     },
     methods:{},
     created(){
         // a bus listener for toggling visibility of the the edit seating form.
         bus.$on('sigEditSeatFormOn', ()=>{
             this.showEditSeatingForm = true;
-        })
+        });
         bus.$on('sigEditSeatFormOff',()=>{
             this.showEditSeatingForm = false;
-        })
-    }
-})
-
-Vue.component('get-data',{
-    template: '#get-data',
-    data(){
-        return{
-            blogs: []
-        }
-    },
-    created(){
-        this.$http.get('test.json').then(function(data){
-            // this.blogs = data.body.slice(0,10);
-            this.blogs = data;
-            console.log(this.blogs);
         });
     }
-})
+});
+
+Vue.component('drop-down-menu',{
+    template: '#drop-down-menu',
+    data(){
+        return {
+            isDropped: false,
+        };
+    },
+    methods:{
+        preventDropmenuClosing(e){
+            console.log(e);
+            $('.dropdown-menu').on('click', (e)=> {
+                console.log('stopped');
+                e.stopPropagation();
+            });
+        }
+    }
+});
+
+Vue.component('download-button',{
+    template: '#download-button', 
+    data: function(){
+        return {
+        };
+    },
+    methods:{
+        downloadStuff: function (){
+            var fileName = "seat-map.json";
+            var jsonString = JSON.stringify(fabCanvas);    
+
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
+            element.setAttribute('download', fileName);
+        
+            element.style.display = 'none';
+            document.body.appendChild(element);
+        
+            element.click();
+        
+            document.body.removeChild(element);
+        },
+    },
+    created: function(){
+    }
+});
 
 var vm = new Vue({
     el:'#vue-app',
     data:{
-
+        mapData: {},
     },
     methods:{
-        preventDropmenuClosing: function(e) {
-            jQuery('.dropdown-menu').on('click', function (e) {
-                console.log('stopped')
-                e.stopPropagation();
-            });
-            alertify.confirm().set({'reverseButtons': true});
-            alertify.prompt().set({'reverseButtons': true});
-        },
          //  makes the seating sections
         makeSeating:function(posX, posY, cols, rows, name) {
             var rad = 10,
@@ -205,22 +228,13 @@ var vm = new Vue({
             fabCanvas.remove(seatingToDelete);
             fabCanvas.renderAll();
         },
-        post:function(){
-            this.$http.post("https://jsonplaceholder.typicode.com/posts",{
-                title: this.blog.title,
-                body: this.blog.content,
-                userId:1
-            }).then(function(data){
-                console.log(data);
-                this.submitted = true;
-            });
-        }
     },
     created(){
         // listens for a signal saying to create a new seating section
         bus.$on('sigMakeSeating', (posX, posY, cols, rows, name)=>{
             console.log(fabCanvas);
             this.makeSeating(posX, posY, cols, rows, name);
+
         });
 
         // listens for a signal saying to delete the seating
@@ -228,5 +242,9 @@ var vm = new Vue({
             this.deleteSeating();
         });
 
+        // loads a canvas instance from the data store in seat-map.json
+        $.getJSON( "./seat-map.json", function( data ) {
+            fabCanvas.loadFromJSON(data);
+          });
     }
-})
+});
