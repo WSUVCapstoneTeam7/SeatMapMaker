@@ -1,14 +1,16 @@
-var fabCanvas = new fabric.Canvas('c');
+/*jshint esversion: 6 */
+const fabCanvas = new fabric.Canvas('c');
 
 fabCanvas.setWidth( window.innerWidth );
-fabCanvas.setHeight( window.innerHeight*.7 );
+fabCanvas.setHeight( window.innerHeight);
+
 
 var bus = new Vue();
 
 Vue.component('app-toolbar',{
     template: '#app-toolbar',
     data(){
-        return{}
+        return{};
     },
     methods:{
         setAddSeating(){ 
