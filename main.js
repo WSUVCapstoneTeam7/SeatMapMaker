@@ -5,111 +5,6 @@ fabCanvas.setHeight( window.innerHeight*.7 );
 
 var bus = new Vue();
 
-Vue.component('app-toolbar',{
-    template: '#app-toolbar',
-    data(){
-        return{}
-    },
-    methods:{
-        setAddSeating(){ 
-            // emits a bus signal to toggle the add seating form.
-            bus.$emit('sigAddSeatFormOn');
-            bus.$emit('sigEditSeatFormOff');
-        },
-        setDeleteSeating(){
-            // emits a bus signal to toggle both forms off
-            bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigEditSeatFormOff');
-            // signal the seating to be deleted
-            bus.$emit('sigDeleteSeating');
-        },
-        setEditTool(){
-            // emits a bus signal to toggle the edit seating form
-            bus.$emit('sigEditSeatFormOn');
-            bus.$emit('sigAddSeatFormOff');
-        },
-    }
-})
-
-Vue.component('add-form',{
-    template: '#add-form',
-    data(){
-        return{
-            sectionName: "test name",
-            columns: 5,
-            rows: 5,
-            showAddSeatForm: false,
-        }
-    },
-    methods:{
-        // triggered whenever a button is clicked. emits a sigMakeSeating signal 
-        // and passes location 100,100 and the values collected from the input fields
-        submitSeatingData(){
-            console.log("submit seat data");
-            // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
-            // parameters to make a seating section. This package will get off at
-            // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName);
-
-            // set toggle the seating forms visibility since the seating section has been created.
-            this.showAddSeatForm = false;
-        }
-    },
-    // function that launches when Forms component is created
-    // signal listeners must be initialized on component creation
-    created(){
-        // a "bus stop" signal listener for toggling the visibility of the add seating form.
-        bus.$on('sigAddSeatFormOn', ()=>{
-            this.showAddSeatForm = true;
-        })
-
-        // a bus listener for toggling the visibility of both forms when 
-        // the delete seating signal is received.
-        bus.$on('sigAddSeatFormOff',()=>{
-            this.showAddSeatForm = false;
-        })
-    }, 
-})
-
-Vue.component('edit-form',{
-    template: '#edit-form',
-    data(){
-        return {
-            posX: 100,
-            posY: 100,
-            rows: 5,
-            cols: 5,
-            showEditSeatingForm: false
-        }
-    },
-    methods:{},
-    created(){
-        // a bus listener for toggling visibility of the the edit seating form.
-        bus.$on('sigEditSeatFormOn', ()=>{
-            this.showEditSeatingForm = true;
-        })
-        bus.$on('sigEditSeatFormOff',()=>{
-            this.showEditSeatingForm = false;
-        })
-    }
-})
-
-Vue.component('get-data',{
-    template: '#get-data',
-    data(){
-        return{
-            blogs: []
-        }
-    },
-    created(){
-        this.$http.get('test.json').then(function(data){
-            // this.blogs = data.body.slice(0,10);
-            this.blogs = data;
-            console.log(this.blogs);
-        });
-    }
-})
-
 var vm = new Vue({
     el:'#vue-app',
     data:{
@@ -229,4 +124,111 @@ var vm = new Vue({
         });
 
     }
+});
+
+Vue.component('app-toolbar',{
+    template: '#app-toolbar',
+    data(){
+        return{}
+    },
+    methods:{
+        setAddSeating(){ 
+            // emits a bus signal to toggle the add seating form.
+            bus.$emit('sigAddSeatFormOn');
+            bus.$emit('sigEditSeatFormOff');
+        },
+        setDeleteSeating(){
+            // emits a bus signal to toggle both forms off
+            bus.$emit('sigAddSeatFormOff');
+            bus.$emit('sigEditSeatFormOff');
+            // signal the seating to be deleted
+            bus.$emit('sigDeleteSeating');
+        },
+        setEditTool(){
+            // emits a bus signal to toggle the edit seating form
+            bus.$emit('sigEditSeatFormOn');
+            bus.$emit('sigAddSeatFormOff');
+        },
+    }
 })
+
+Vue.component('add-form',{
+    template: '#add-form',
+    data(){
+        return{
+            sectionName: "test name",
+            columns: 5,
+            rows: 5,
+            showAddSeatForm: false,
+        }
+    },
+    methods:{
+        // triggered whenever a button is clicked. emits a sigMakeSeating signal 
+        // and passes location 100,100 and the values collected from the input fields
+        submitSeatingData(){
+            console.log("submit seat data");
+            // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
+            // parameters to make a seating section. This package will get off at
+            // the bus.$on (bus stop) and get routed to where it should be delivered.
+            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName);
+
+            // set toggle the seating forms visibility since the seating section has been created.
+            this.showAddSeatForm = false;
+        }
+    },
+    // function that launches when Forms component is created
+    // signal listeners must be initialized on component creation
+    created(){
+        // a "bus stop" signal listener for toggling the visibility of the add seating form.
+        bus.$on('sigAddSeatFormOn', ()=>{
+            this.showAddSeatForm = true;
+        })
+
+        // a bus listener for toggling the visibility of both forms when 
+        // the delete seating signal is received.
+        bus.$on('sigAddSeatFormOff',()=>{
+            this.showAddSeatForm = false;
+        })
+    }, 
+})
+
+Vue.component('edit-form',{
+    template: '#edit-form',
+    data(){
+        return {
+            posX: 100,
+            posY: 100,
+            rows: 5,
+            cols: 5,
+            showEditSeatingForm: false
+        }
+    },
+    methods:{},
+    created(){
+        // a bus listener for toggling visibility of the the edit seating form.
+        bus.$on('sigEditSeatFormOn', ()=>{
+            this.showEditSeatingForm = true;
+        })
+        bus.$on('sigEditSeatFormOff',()=>{
+            this.showEditSeatingForm = false;
+        })
+    }
+})
+
+Vue.component('get-data',{
+    template: '#get-data',
+    data(){
+        return{
+            blogs: []
+        }
+    },
+    created(){
+        this.$http.get('test.json').then(function(data){
+            // this.blogs = data.body.slice(0,10);
+            this.blogs = data;
+            console.log(this.blogs);
+        });
+    }
+})
+
+
