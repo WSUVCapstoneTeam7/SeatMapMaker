@@ -73,29 +73,17 @@ Vue.component('edit-form',{
 Vue.component('drop-down-menu',{
     template: '#drop-down-menu',
     data(){
-        return {
-            isDropped: false,
-        };
+        return {};
     },
     methods:{
         preventDropmenuClosing(e){
-            console.log(e);
             $('.dropdown-menu').on('click', (e)=> {
-                console.log('stopped');
+                // console.log(e);
+                // console.log('stopped');
                 e.stopPropagation();
             });
-        }
-    }
-});
-
-Vue.component('download-button',{
-    template: '#download-button', 
-    data: function(){
-        return {
-        };
-    },
-    methods:{
-        downloadStuff: function (){
+        },
+        downloadStuff(){
             var fileName = "seat-map.json";
             var jsonString = JSON.stringify(fabCanvas);    
 
@@ -110,10 +98,26 @@ Vue.component('download-button',{
         
             document.body.removeChild(element);
         },
-    },
-    created: function(){
+        setAddSeating(){ 
+            // emits a bus signal to toggle the add seating form.
+            bus.$emit('sigAddSeatFormOn');
+            bus.$emit('sigEditSeatFormOff');
+        },
+        setDeleteSeating(){
+            // emits a bus signal to toggle both forms off
+            bus.$emit('sigAddSeatFormOff');
+            bus.$emit('sigEditSeatFormOff');
+            // signal the seating to be deleted
+            bus.$emit('sigDeleteSeating');
+        },
+        setEditTool(){
+            // emits a bus signal to toggle the edit seating form
+            bus.$emit('sigEditSeatFormOn');
+            bus.$emit('sigAddSeatFormOff');
+        },
     }
 });
+
 
 var vm = new Vue({
     el:'#vue-app',
