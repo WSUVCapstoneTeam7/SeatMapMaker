@@ -166,6 +166,7 @@ var vm = new Vue({
             items.push(container);
             items.push(text);
     
+            num = 0;    //This will become a user input variable!!!
             for (var i=0; i < rows; i++) {
                 for (var j=0; j < cols; j++) {
                     console.log("adding seating");
@@ -175,7 +176,7 @@ var vm = new Vue({
                         color = 'green';
                     var circle = this.seating(rad, sideBuff, topBuff, dia, gap, text, posX, posY, i, j, color);
                     //CF Adds seats here!
-                    this.mapData.seatArray.push({circle, row: i, col: j, isBought: false});
+                    this.mapData.seatArray.push({circle, row: i, col: j, isBought: false, price: num});
                     console.log(this.mapData.seatArray);
                     // var circle = new fabric.Circle({
                     //     radius: rad, 
