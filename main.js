@@ -166,14 +166,17 @@ var vm = new Vue({
             items.push(container);
             items.push(text);
     
-            array = [];
+            let seatArray = [];
             for (var i=0; i < rows; i++) {
                 for (var j=0; j < cols; j++) {
                     console.log("adding seating");
-                    var circle = this.seating(rad, sideBuff, topBuff, dia, gap, text, posX, posY, i, j);
-                    array.push(circle);
-                    console.log(array);
-                    console.log({circle, row: i, col: j});
+                    if (i == j)
+                        color = 'red';
+                    else
+                        color = 'green';
+                    var circle = this.seating(rad, sideBuff, topBuff, dia, gap, text, posX, posY, i, j, color);
+                    seatArray.push({circle, row: i, col: j});
+                    console.log(seatArray);
                     // var circle = new fabric.Circle({
                     //     radius: rad, 
                     //     fill: 'green', 
@@ -213,10 +216,10 @@ var vm = new Vue({
             fabCanvas.renderAll();
         },
         //Making individual seats.
-        seating (rad, sideBuff, topBuff, dia, gap, text, posX, posY, row, col, i, j) {
+        seating (rad, sideBuff, topBuff, dia, gap, text, posX, posY, i, j, color) {
             var circle = new fabric.Circle({
                 radius: rad, 
-                fill: 'green', 
+                fill: color, 
                 left: posX, 
                 top: posY,
                 left: (posX + sideBuff) + rad + j*dia + j*gap, 
