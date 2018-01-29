@@ -166,20 +166,20 @@ var vm = new Vue({
             items.push(text);
     
             for (var i=0; i < rows; i++) {
-            for (var j=0; j < cols; j++) {
-                console.log("adding circle");
-                var circle = new fabric.Circle({
-                radius: rad, 
-                fill: 'green', 
-                left: posX, 
-                top: posY,
-                left: (posX + sideBuff) + rad + j*dia + j*gap, 
-                top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
-                originX: 'center',
-                originY: 'center'
-                });
-                items.push(circle);
-            }
+                for (var j=0; j < cols; j++) {
+                    console.log("adding circle");
+                    var circle = new fabric.Circle({
+                        radius: rad, 
+                        fill: 'green', 
+                        left: posX, 
+                        top: posY,
+                        left: (posX + sideBuff) + rad + j*dia + j*gap, 
+                        top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
+                        originX: 'center',
+                        originY: 'center'
+                    });
+                    items.push(circle);
+                }
             }
             var group = new fabric.Group(items, {
             lockScalingX: true,
