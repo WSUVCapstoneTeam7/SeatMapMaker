@@ -122,7 +122,7 @@ Vue.component('drop-down-menu',{
 var vm = new Vue({
     el:'#vue-app',
     data:{
-        mapData: {},
+        mapData: {seatArray: []},
     },
     methods:{
 
@@ -166,17 +166,17 @@ var vm = new Vue({
             items.push(container);
             items.push(text);
     
-            let seatArray = [];
             for (var i=0; i < rows; i++) {
                 for (var j=0; j < cols; j++) {
                     console.log("adding seating");
-                    if (i == j)
+                    if (i == j) //DEMO for now. Change to 'isBought' flag.
                         color = 'red';
                     else
                         color = 'green';
                     var circle = this.seating(rad, sideBuff, topBuff, dia, gap, text, posX, posY, i, j, color);
-                    seatArray.push({circle, row: i, col: j});
-                    console.log(seatArray);
+                    //CF Adds seats here!
+                    this.mapData.seatArray.push({circle, row: i, col: j, isBought: false});
+                    console.log(this.mapData.seatArray);
                     // var circle = new fabric.Circle({
                     //     radius: rad, 
                     //     fill: 'green', 
