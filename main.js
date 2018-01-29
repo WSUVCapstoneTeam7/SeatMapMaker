@@ -125,6 +125,7 @@ var vm = new Vue({
         mapData: {},
     },
     methods:{
+
          //  makes the seating sections
         makeSeating:function(posX, posY, cols, rows, name) {
             var rad = 10,
@@ -165,19 +166,24 @@ var vm = new Vue({
             items.push(container);
             items.push(text);
     
+            array = [];
             for (var i=0; i < rows; i++) {
                 for (var j=0; j < cols; j++) {
-                    console.log("adding circle");
-                    var circle = new fabric.Circle({
-                        radius: rad, 
-                        fill: 'green', 
-                        left: posX, 
-                        top: posY,
-                        left: (posX + sideBuff) + rad + j*dia + j*gap, 
-                        top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
-                        originX: 'center',
-                        originY: 'center'
-                    });
+                    console.log("adding seating");
+                    var circle = this.seating(rad, sideBuff, topBuff, dia, gap, text, posX, posY, i, j);
+                    array.push(circle);
+                    console.log(array);
+                    console.log({circle, row: i, col: j});
+                    // var circle = new fabric.Circle({
+                    //     radius: rad, 
+                    //     fill: 'green', 
+                    //     left: posX, 
+                    //     top: posY,
+                    //     left: (posX + sideBuff) + rad + j*dia + j*gap, 
+                    //     top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
+                    //     originX: 'center',
+                    //     originY: 'center'
+                    // });
                     items.push(circle);
                 }
             }
@@ -206,11 +212,26 @@ var vm = new Vue({
             fabCanvas.remove(seatingToDelete);
             fabCanvas.renderAll();
         },
+        //Making individual seats.
+        seating (rad, sideBuff, topBuff, dia, gap, text, posX, posY, row, col, i, j) {
+            var circle = new fabric.Circle({
+                radius: rad, 
+                fill: 'green', 
+                left: posX, 
+                top: posY,
+                left: (posX + sideBuff) + rad + j*dia + j*gap, 
+                top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
+                originX: 'center',
+                originY: 'center'
+            });
+            console.log(circle);
+            return circle;
+        }
     },
     created(){
         // listens for a signal saying to create a new seating section
         bus.$on('sigMakeSeating', (posX, posY, cols, rows, name)=>{
-            console.log(fabCanvas);
+            //console.log(fabCanvas);
             this.makeSeating(posX, posY, cols, rows, name);
 
         });
