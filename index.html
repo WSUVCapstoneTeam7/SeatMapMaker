@@ -92,12 +92,12 @@
         <div v-show="showEditSeatingForm">
             <form>
                 Edit Seating <br>
-                Name: <input type="text" id="newName"></input><br>
-                Columns: <input type="text" id="newCols" style="width:30"></input>
-                Rows: <input type="text" id="newRows" style="width:30"></input>
+                Name: <input type="text" id="newName" v-model="name"></input><br>
+                Columns: <input type="text" id="newCols" style="width:30" v-model="cols"></input>
+                Rows: <input type="text" id="newRows" style="width:30" v-model="rows"></input>
                 <br>
             </form> 
-            <!-- <button v-on:click ="submitEditSeating">Submit changes</button> -->
+            <button v-on:click ="submitEditSeating">Submit</button>
         </div>
     </template>
     <script src="main.js"></script>

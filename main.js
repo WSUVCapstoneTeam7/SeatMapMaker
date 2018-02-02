@@ -51,14 +51,25 @@ Vue.component('edit-form',{
     template: '#edit-form',
     data(){
         return {
-            posX: 100,
-            posY: 100,
+            name: "defaultName",
             rows: 5,
             cols: 5,
+            posX: 100,
+            posY: 100,
             showEditSeatingForm: false
         };
     },
-    methods:{},
+    methods:{
+        submitEditSeating(){
+            console.log(fabCanvas.getActiveObject())
+            console.log(fabCanvas.getActiveObject().calcCoords())
+            if (fabCanvas.getActiveObject() != null) {
+                var coords = fabCanvas.getActiveObject().calcCoords()
+                vm.deleteSeating()
+                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name)    
+            }
+        }
+    },
     created(){
         // a bus listener for toggling visibility of the the edit seating form.
         bus.$on('sigEditSeatFormOn', ()=>{
