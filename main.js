@@ -12,9 +12,9 @@ Vue.component('add-form',{
     template: '#add-form',
     data(){
         return{
-            sectionName: "test name",
-            columns: 5,
-            rows: 5,
+            sectionName: "",
+            columns: null,
+            rows: null,
             showAddSeatForm: false,
         };
     },
@@ -51,9 +51,9 @@ Vue.component('edit-form',{
     template: '#edit-form',
     data(){
         return {
-            name: "defaultName",
-            rows: 5,
-            cols: 5,
+            name: "",
+            rows: null,
+            cols: null,
             posX: 100,
             posY: 100,
             showEditSeatingForm: false
@@ -66,7 +66,7 @@ Vue.component('edit-form',{
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name)    
+                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name)
             }
         }
     },
