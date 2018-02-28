@@ -76,6 +76,12 @@
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
                 Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
+                <!--<p>Seating Type</p><br>-->
+                Seating Type: <form>
+                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
+                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
+                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
+                </form>
                 Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
                 Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
                 <br>
@@ -93,6 +99,11 @@
             <form>
                 Edit Seating <br>
                 Name: <input type="text" id="newName" v-model="name" placeholder="Section Name"></input><br>
+                Seating Type: <form>
+                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
+                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
+                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
+                </form>
                 Columns: <input type="text" id="newCols" style="width:30" v-model="cols" placeholder="#"></input>
                 Rows: <input type="text" id="newRows" style="width:30" v-model="rows" placeholder="#"></input>
                 <br>

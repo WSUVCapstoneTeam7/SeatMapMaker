@@ -13,6 +13,7 @@ Vue.component('add-form',{
     data(){
         return{
             sectionName: "",
+            sectionType: "",
             columns: null,
             rows: null,
             showAddSeatForm: false,
@@ -23,10 +24,11 @@ Vue.component('add-form',{
         // and passes location 100,100 and the values collected from the input fields
         submitSeatingData(){
             console.log("submit seat data");
-            // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
+            console.log(this.sectionType);
+            // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName);
+            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName, this.sectionType);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -52,10 +54,11 @@ Vue.component('edit-form',{
     data(){
         return {
             name: "",
-            rows: null,
-            cols: null,
-            posX: 100,
-            posY: 100,
+            sectionType: "",
+            rows: this.rows,
+            cols: this.cols,
+            posX: this.posX,
+            posY: this.posY,
             showEditSeatingForm: false
         };
     },
@@ -66,7 +69,7 @@ Vue.component('edit-form',{
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name)
+                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType)
             }
         }
     },
@@ -137,7 +140,7 @@ var vm = new Vue({
     },
     methods:{
          //  makes the seating sections
-        makeSeating:function(posX, posY, cols, rows, name) {
+        makeSeating:function(posX, posY, cols, rows, name, type) {
             var rad = 10,
             dia = rad*2,
             gap = 5,
@@ -175,19 +178,25 @@ var vm = new Vue({
     
             items.push(container);
             items.push(text);
-    
+            var color = "";
+            if (type == "VSeating")
+                color = "green";
+            else if (type == "NSeating")
+                color = "yellow";
+            else if (type == "Standing")
+                color = "red";
             for (var i=0; i < rows; i++) {
             for (var j=0; j < cols; j++) {
                 console.log("adding circle");
                 var circle = new fabric.Circle({
-                radius: rad, 
-                fill: 'green', 
+                radius: rad,
                 left: posX, 
                 top: posY,
                 left: (posX + sideBuff) + rad + j*dia + j*gap, 
                 top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
                 originX: 'center',
-                originY: 'center'
+                originY: 'center',
+                fill: color,
                 });
                 items.push(circle);
             }
@@ -220,9 +229,9 @@ var vm = new Vue({
     },
     created(){
         // listens for a signal saying to create a new seating section
-        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name)=>{
+        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type)=>{
             console.log(fabCanvas);
-            this.makeSeating(posX, posY, cols, rows, name);
+            this.makeSeating(posX, posY, cols, rows, name, type);
 
         });
 
