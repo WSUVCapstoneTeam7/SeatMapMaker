@@ -75,9 +75,9 @@
         <div v-show="showAddSeatForm">
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
-                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns"></input>
-                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows"></input>
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
+                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
+                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
                 <br>
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
@@ -92,12 +92,12 @@
         <div v-show="showEditSeatingForm">
             <form>
                 Edit Seating <br>
-                Name: <input type="text" id="newName"></input><br>
-                Columns: <input type="text" id="newCols" style="width:30"></input>
-                Rows: <input type="text" id="newRows" style="width:30"></input>
+                Name: <input type="text" id="newName" v-model="name" placeholder="Section Name"></input><br>
+                Columns: <input type="text" id="newCols" style="width:30" v-model="cols" placeholder="#"></input>
+                Rows: <input type="text" id="newRows" style="width:30" v-model="rows" placeholder="#"></input>
                 <br>
             </form> 
-            <!-- <button v-on:click ="submitEditSeating">Submit changes</button> -->
+            <button v-on:click ="submitEditSeating">Submit</button>
         </div>
     </template>
     <script src="main.js"></script>
