@@ -1,17 +1,17 @@
 /*jshint esversion: 6 */
 const fabCanvas = new fabric.Canvas('c');
 
-fabCanvas.setWidth( window.innerWidth );
-fabCanvas.setHeight( window.innerHeight);
+fabCanvas.setWidth(window.innerWidth);
+fabCanvas.setHeight(window.innerHeight);
 
 
 var bus = new Vue();
 
 
-Vue.component('add-form',{
+Vue.component('add-form', {
     template: '#add-form',
-    data(){
-        return{
+    data() {
+        return {
             sectionName: "",
             sectionType: "",
             columns: null,
@@ -19,16 +19,16 @@ Vue.component('add-form',{
             showAddSeatForm: false,
         };
     },
-    methods:{
+    methods: {
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
-        submitSeatingData(){
+        submitSeatingData() {
             console.log("submit seat data");
             console.log(this.sectionType);
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName, this.sectionType);
+            bus.$emit('sigMakeSeating', 100, 100, this.columns, this.rows, this.sectionName, this.sectionType);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -36,22 +36,22 @@ Vue.component('add-form',{
     },
     // function that launches when Forms component is created
     // signal listeners must be initialized on component creation
-    created(){
+    created() {
         // a "bus stop" signal listener for toggling the visibility of the add seating form.
-        bus.$on('sigAddSeatFormOn', ()=>{
+        bus.$on('sigAddSeatFormOn', () => {
             this.showAddSeatForm = true;
         });
         // a bus listener for toggling the visibility of both forms when 
         // the delete seating signal is received.
-        bus.$on('sigAddSeatFormOff',()=>{
+        bus.$on('sigAddSeatFormOff', () => {
             this.showAddSeatForm = false;
         });
-    }, 
+    },
 });
 
-Vue.component('edit-form',{
+Vue.component('edit-form', {
     template: '#edit-form',
-    data(){
+    data() {
         return {
             name: "",
             sectionType: "",
@@ -62,8 +62,8 @@ Vue.component('edit-form',{
             showEditSeatingForm: false
         };
     },
-    methods:{
-        submitEditSeating(){
+    methods: {
+        submitEditSeating() {
             console.log(fabCanvas.getActiveObject())
             console.log(fabCanvas.getActiveObject().calcCoords())
             if (fabCanvas.getActiveObject() != null) {
@@ -73,58 +73,58 @@ Vue.component('edit-form',{
             }
         }
     },
-    created(){
+    created() {
         // a bus listener for toggling visibility of the the edit seating form.
-        bus.$on('sigEditSeatFormOn', ()=>{
+        bus.$on('sigEditSeatFormOn', () => {
             this.showEditSeatingForm = true;
         });
-        bus.$on('sigEditSeatFormOff',()=>{
+        bus.$on('sigEditSeatFormOff', () => {
             this.showEditSeatingForm = false;
         });
     }
 });
 
-Vue.component('drop-down-menu',{
+Vue.component('drop-down-menu', {
     template: '#drop-down-menu',
-    data(){
+    data() {
         return {};
     },
-    methods:{
-        preventDropmenuClosing(e){
-            $('.dropdown-menu').on('click', (e)=> {
+    methods: {
+        preventDropmenuClosing(e) {
+            $('.dropdown-menu').on('click', (e) => {
                 // console.log(e);
                 // console.log('stopped');
                 e.stopPropagation();
             });
         },
-        downloadStuff(){
+        downloadStuff() {
             var fileName = "seat-map.json";
-            var jsonString = JSON.stringify(fabCanvas);    
+            var jsonString = JSON.stringify(fabCanvas);
 
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
             element.setAttribute('download', fileName);
-        
+
             element.style.display = 'none';
             document.body.appendChild(element);
-        
+
             element.click();
-        
+
             document.body.removeChild(element);
         },
-        setAddSeating(){ 
+        setAddSeating() {
             // emits a bus signal to toggle the add seating form.
             bus.$emit('sigAddSeatFormOn');
             bus.$emit('sigEditSeatFormOff');
         },
-        setDeleteSeating(){
+        setDeleteSeating() {
             // emits a bus signal to toggle both forms off
             bus.$emit('sigAddSeatFormOff');
             bus.$emit('sigEditSeatFormOff');
             // signal the seating to be deleted
             bus.$emit('sigDeleteSeating');
         },
-        setEditTool(){
+        setEditTool() {
             // emits a bus signal to toggle the edit seating form
             bus.$emit('sigEditSeatFormOn');
             bus.$emit('sigAddSeatFormOff');
@@ -134,48 +134,56 @@ Vue.component('drop-down-menu',{
 
 
 var vm = new Vue({
-    el:'#vue-app',
-    data:{
+    el: '#vue-app',
+    data: {
         mapData: {},
     },
-    methods:{
-         //  makes the seating sections
-        makeSeating:function(posX, posY, cols, rows, name, type) {
+    methods: {
+        GenerateSectionListItem(p) {
+            return { sectionID: "", price: p, rows: [], fabText: null, fabRect: null }
+        },
+        GenerateRowListItem(i) {
+            return { rowID: i, seats: [] }
+        },
+        GenerateSeatListItem(j, c, p) { //CNF: Price is in both seat and section to help editor and viewers.
+            return { seatID: j, fabCircle: c, isSold: false, price: p }
+        },
+        makeSeating: function (posX, posY, cols, rows, name, type) {
             var rad = 10,
-            dia = rad*2,
-            gap = 5,
-            sideBuff = 10,
-            topBuff = 10,
-            bottomBuff = 10,
-            sizeX = sideBuff*2 + cols*dia + (cols-1)*gap,
-            sizeY = topBuff + bottomBuff + rows*dia + (rows-1)*gap;
-    
+                dia = rad * 2,
+                gap = 5,
+                sideBuff = 10,
+                topBuff = 10,
+                bottomBuff = 10,
+                sizeX = sideBuff * 2 + cols * dia + (cols - 1) * gap,
+                sizeY = topBuff + bottomBuff + rows * dia + (rows - 1) * gap;
+
             var items = [];
-    
+
             var container = new fabric.Rect({
-            left: posX,
-            top: posY,
-            originX: 'left',
-            originY: 'top',
-            stroke: 'black',
-            fill: 'transparent',
-            width: sizeX,
-            height: sizeY,
+                left: posX,
+                top: posY,
+                originX: 'left',
+                originY: 'top',
+                stroke: 'black',
+                fill: 'transparent',
+                width: sizeX,
+                height: sizeY,
             });
-    
+
             var text = new fabric.IText(name, {
-            fontSize: 20,
-            fontFamily: 'sans-serif',
-            left: (posX+(sizeX/2)),
-            top: (posY+10),
-            originX: 'center', 
-            originY: 'top',
-            hasControls: false	
+                fontSize: 20,
+                fontFamily: 'sans-serif',
+                left: (posX + (sizeX / 2)),
+                top: (posY + 10),
+                originX: 'center',
+                originY: 'top',
+                hasControls: false
             });
-    
+
             // resize container to accomodate text (maybe just make text box first?)
-            container.setHeight(topBuff*2 + text.height + bottomBuff + rows*dia + (rows-1)*gap);
-    
+            container.setHeight(topBuff * 2 + text.height + bottomBuff + rows * dia + (rows - 1) * gap);
+
             items.push(container);
             items.push(text);
             var color = "";
@@ -185,64 +193,68 @@ var vm = new Vue({
                 color = "yellow";
             else if (type == "Standing")
                 color = "red";
-            for (var i=0; i < rows; i++) {
-            for (var j=0; j < cols; j++) {
-                console.log("adding circle");
-                var circle = new fabric.Circle({
-                radius: rad,
-                left: posX, 
-                top: posY,
-                left: (posX + sideBuff) + rad + j*dia + j*gap, 
-                top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
-                originX: 'center',
-                originY: 'center',
-                fill: color,
-                });
-                items.push(circle);
-            }
+            for (var i = 0; i < rows; i++) {
+                section_list_item.rows.push(this.GenerateRowListItem(i)); //CNF
+                var row_list_length = section_list_item.rows.length;  //CNF
+                var row_list_item = section_list_item.rows[row_list_length - 1];  //CNF
+                for (var j = 0; j < cols; j++) {
+                    console.log("adding circle");
+                    var circle = new fabric.Circle({
+                        radius: rad,
+                        left: posX,
+                        top: posY,
+                        left: (posX + sideBuff) + rad + j * dia + j * gap,
+                        top: (text.top + text.height + topBuff) + rad + i * dia + i * gap,
+                        originX: 'center',
+                        originY: 'center',
+                        fill: color,
+                    });
+                    items.push(circle);
+                    row_list_item.seats.push(this.GenerateSeatListItem(j, circle, price)); //CNF
+                }
             }
             var group = new fabric.Group(items, {
-            lockScalingX: true,
-            lockScalingY: true	
+                lockScalingX: true,
+                lockScalingY: true
             });
             // this.seatArray.push(group);
             fabCanvas.add(group);
             fabCanvas.renderAll();
             // SEE BELOW LINE: how to attach functions to act on objects given a certain event
-        /*	group.on('mousedown', fabricDblClick(group, function (obj) {
-            ungroup(group);
-            canvas.setActiveObject(text);
-            text.enterEditing();
-            text.selectAll();
-            })); */
+            /*	group.on('mousedown', fabricDblClick(group, function (obj) {
+                ungroup(group);
+                canvas.setActiveObject(text);
+                text.enterEditing();
+                text.selectAll();
+                })); */
             // SEE OLD CODE: "Double-click text editing" for full code
-        
+
         },
         // removes the currently selected Seat Selection from the fabCanvas.
-        deleteSeating:function(){
+        deleteSeating: function () {
             // gets the currently active square
             var seatingToDelete = fabCanvas.getActiveObject();
-            console.log("This is Rect to Delete From Fabric: "+seatingToDelete);
+            console.log("This is Rect to Delete From Fabric: " + seatingToDelete);
             fabCanvas.remove(seatingToDelete);
             fabCanvas.renderAll();
         },
     },
-    created(){
+    created() {
         // listens for a signal saying to create a new seating section
-        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type)=>{
+        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type) => {
             console.log(fabCanvas);
             this.makeSeating(posX, posY, cols, rows, name, type);
 
         });
 
         // listens for a signal saying to delete the seating
-        bus.$on('sigDeleteSeating', ()=>{
+        bus.$on('sigDeleteSeating', () => {
             this.deleteSeating();
         });
 
         // loads a canvas instance from the data store in seat-map.json
-        $.getJSON( "./seat-map.json", function( data ) {
+        $.getJSON("./seat-map.json", function (data) {
             fabCanvas.loadFromJSON(data);
-          });
+        });
     }
 });
