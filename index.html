@@ -7,16 +7,12 @@
         
 
         <meta charset="utf-8">
-        <title>Seat-Map-Maker</title>
+        <title>Testing</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-        <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
-        <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        
         <!--Ty CSS-->
         <link rel="stylesheet" type="text/css" href="styles.css"/>
         
@@ -36,37 +32,47 @@
             <div class="row">
                 <img class="navbar-brand" src="res\logo2.png" alt="logo">
                 <ul class="nav navbar-nav">
-                    <!-- <li class="nav-item"><a href="#" class="nav-link">START</a></li> -->
+                    <li class="nav-item"><a href="#" class="nav-link">START</a></li>
                 </ul>
             </div>
         </nav>
 
         <div id = "wrapper">
-            <div id = "vue-app" class = "container-fluid">
-                <drop-down-menu></drop-down-menu>
+            <div id = "vue-app" v-on:click='preventDropmenuClosing' class = "container-fluid">
+                <div class="dropdown">
+                    <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Toolbox
+                    </button>
+                    <div class="dropdown-menu">
+                        <app-toolbar></app-toolbar>
+                        <get-data></get-data>
+                    </div>
+                </div>
             </div> 
             <div id="canvas">
                 <canvas id="c" width="1920" height="1080"></canvas>
             </div>
-        </div> 
+        </div>
+      
     </body>
 
-    <template id = "drop-down-menu">
-        <div class="dropdown"  v-on:click = "preventDropmenuClosing" >
-            <button class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" v-bind:aria-expanded="false">
-                Toolbox
-            </button>
-            <div class="dropdown-menu">
-                <br>
-                <!-- each button tag has a v-on directive that leads to a different listener method -->
-                <button v-on:click='setAddSeating' class="dropdown-item">Add Seating</button>
-                <add-form></add-form>
-                <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
-                <edit-form></edit-form>
-                <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
-                <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
-                <br>
-            </div>
+    <template id="app-toolbar" >
+        <div >
+            <br>
+            <!-- each button tag has a v-on directive that leads to a different listener method -->
+            <a v-on:click='setAddSeating' class="dropdown-item">Add Seating</a>
+            <add-form></add-form>
+            <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
+            <edit-form></edit-form>
+            <!-- NEW STUFF -->
+            <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
+            <add-general-form></add-general-form>
+            <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
+            <add-table-form></add-table-form>            
+            <!-- END OF NEW STUFF -->
+            <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
+
+            <br>
         </div>
     </template>
 
@@ -75,15 +81,9 @@
         <div v-show="showAddSeatForm">
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
-                <!--<p>Seating Type</p><br>-->
-                Seating Type: <form>
-                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
-                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
-                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
-                </form>
-                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
-                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
+                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns"></input>
+                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows"></input>
                 <br>
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
@@ -98,20 +98,64 @@
         <div v-show="showEditSeatingForm">
             <form>
                 Edit Seating <br>
-                Name: <input type="text" id="newName" v-model="name" placeholder="Section Name"></input><br>
-                Seating Type: <form>
-                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
-                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
-                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
-                </form>
-                Columns: <input type="text" id="newCols" style="width:30" v-model="cols" placeholder="#"></input>
-                Rows: <input type="text" id="newRows" style="width:30" v-model="rows" placeholder="#"></input>
+                Name: <input type="text" id="newName"></input><br>
+                Columns: <input type="text" id="newCols" style="width:30"></input>
+                Rows: <input type="text" id="newRows" style="width:30"></input>
                 <br>
             </form> 
-            <button v-on:click ="submitEditSeating">Submit</button>
+            <!-- <button v-on:click ="submitEditSeating">Submit changes</button> -->
+        </div>
+    </template>
+<!-- NEW STUFF -->
+    <template id = "add-general-form">
+        <!-- v-show directive makes div invisible if "showGeneralForm" is false -->
+        <div v-show="showAddGenForm">
+            <form>
+                <!-- v-model directive binds data from field to data in Vue instance -->
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
+                <br>
+            </form>
+            <!-- v-on calls "submitGeneralData" when a click event is detected on this button  -->
+            <button v-on:click ="submitGeneralData">Submit</button>
+            <!-- Debugging to see that the form toggle flag is being set -->
+        <p v-show="false"><span>{{showAddGenForm}}</span></p>
+        </div>        
+    </template>
+
+    <template id = "add-table-form">
+        <!-- v-show directive makes div invisible if "showTableForm" is false -->
+        <div v-show="showAddTableForm">
+            <form>
+                <!-- v-model directive binds data from field to data in Vue instance -->
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
+                <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
+                <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle<br>
+                Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
+                X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
+                Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
+                <br>
+            </form>
+            <!-- v-on calls "submitTableData" when a click event is detected on this button -->
+            <button v-on:click ="submitTableData">Submit</button>
+            <!-- Debugging to see that the form toggle flag is being set -->
+        <p v-show="false"><span>{{showAddTableForm}}</span></p>
+        </div>        
+    </template>
+<!-- END OF NEW STUFF -->
+    <template id = "get-data">
+        <div>
+            <button v-on:click = "Load Map">GetData</button>
+            <br>
+            <button v-on:click = "Save Map">postData</button>
+            <!-- <a v-for = "(blog,index) in blogs" v-bind:key ="index">{{blog.title}}</a> -->
         </div>
     </template>
     <script src="main.js"></script>
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 </html>
 
 
