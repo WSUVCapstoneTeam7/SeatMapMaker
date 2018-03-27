@@ -57,10 +57,9 @@ Vue.component('add-form',{
     template: '#add-form',
     data(){
         return{
-            sectionName: "",
-            sectionType: "",
-            columns: null,
-            rows: null,
+            sectionName: "test name",
+            columns: 5,
+            rows: 5,
             showAddSeatForm: false,
         }
     },
@@ -69,11 +68,10 @@ Vue.component('add-form',{
         // and passes location 100,100 and the values collected from the input fields
         submitSeatingData(){
             console.log("submit seat data");
-            console.log(this.sectionType);
-            // emit a Make Seating bus signal; or place a passenger on the bus carrying the
+            // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName, this.sectionType);
+            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -99,26 +97,14 @@ Vue.component('edit-form',{
     template: '#edit-form',
     data(){
         return {
-            name: "",
-            sectionType: "",
-            rows: this.rows,
-            cols: this.cols,
-            posX: this.posX,
-            posY: this.posY,
+            posX: 100,
+            posY: 100,
+            rows: 5,
+            cols: 5,
             showEditSeatingForm: false
         }
     },
-    methods:{
-        submitEditSeating(){
-            console.log(fabCanvas.getActiveObject())
-            console.log(fabCanvas.getActiveObject().calcCoords())
-            if (fabCanvas.getActiveObject() != null) {
-                var coords = fabCanvas.getActiveObject().calcCoords()
-                vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType)
-            }
-        }
-    },
+    methods:{},
     created(){
         // a bus listener for toggling visibility of the the edit seating form.
         bus.$on('sigEditSeatFormOn', ()=>{
@@ -242,7 +228,7 @@ var vm = new Vue({
             alertify.prompt().set({'reverseButtons': true});
         },
          //  makes the seating sections
-        makeSeating:function(posX, posY, cols, rows, name, type) {
+        makeSeating:function(posX, posY, cols, rows, name) {
             var rad = 10,
             dia = rad*2,
             gap = 5,
@@ -280,25 +266,19 @@ var vm = new Vue({
     
             items.push(container);
             items.push(text);
-            var color = "";
-            if (type == "VSeating")
-                color = "green";
-            else if (type == "NSeating")
-                color = "yellow";
-            else if (type == "Standing")
-                color = "red";
+    
             for (var i=0; i < rows; i++) {
             for (var j=0; j < cols; j++) {
                 console.log("adding circle");
                 var circle = new fabric.Circle({
-                radius: rad,
+                radius: rad, 
+                fill: 'green', 
                 left: posX, 
                 top: posY,
                 left: (posX + sideBuff) + rad + j*dia + j*gap, 
                 top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
                 originX: 'center',
-                originY: 'center',
-                fill: color,
+                originY: 'center'
                 });
                 items.push(circle);
             }
@@ -595,10 +575,9 @@ var vm = new Vue({
 
     created(){
         // listens for a signal saying to create a new seating section
-        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type)=>{
+        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name)=>{
             console.log(fabCanvas);
-            this.makeSeating(posX, posY, cols, rows, name, type);
-
+            this.makeSeating(posX, posY, cols, rows, name);
         });
 
         // listens for a signal saying to delete the seating
