@@ -7,54 +7,6 @@ fabCanvas.setHeight( window.innerHeight);
 
 var bus = new Vue();
 
-Vue.component('app-toolbar',{
-    template: '#app-toolbar',
-    data(){
-        return{}
-    },
-    methods:{
-        setAddSeating(){ 
-            // emits a bus signal to toggle the add seating form.
-            bus.$emit('sigAddSeatFormOn');
-            bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOff');
-        },
-        setDeleteSeating(){
-            // emits a bus signal to toggle both forms off
-            bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOff');
-            // signal the seating to be deleted
-            bus.$emit('sigDeleteSeating');
-        },
-        setEditTool(){
-            // emits a bus signal to toggle the edit seating form
-            bus.$emit('sigEditSeatFormOn');
-            bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOff');
-        },
-        // NEW STUFF
-        setAddGeneral(){ 
-            // emits a bus signal to toggle the add general form.
-            bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOn');
-            bus.$emit('sigAddTableFormOff');
-        },
-        setAddTable(){ 
-            // emits a bus signal to toggle the add general form.
-            bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOn');
-        },
-        // END OF NEW STUFF
-    }
-})
-
 Vue.component('add-form',{
     template: '#add-form',
     data(){
@@ -163,6 +115,8 @@ Vue.component('drop-down-menu',{
             // emits a bus signal to toggle the add seating form.
             bus.$emit('sigAddSeatFormOn');
             bus.$emit('sigEditSeatFormOff');
+            bus.$emit('sigAddGenFormOff');
+            bus.$emit('sigAddTableFormOff');
         },
         setDeleteSeating(){
             // emits a bus signal to toggle both forms off
@@ -170,12 +124,32 @@ Vue.component('drop-down-menu',{
             bus.$emit('sigEditSeatFormOff');
             // signal the seating to be deleted
             bus.$emit('sigDeleteSeating');
+            bus.$emit('sigAddGenFormOff');
+            bus.$emit('sigAddTableFormOff');
         },
         setEditTool(){
             // emits a bus signal to toggle the edit seating form
             bus.$emit('sigEditSeatFormOn');
             bus.$emit('sigAddSeatFormOff');
+            bus.$emit('sigAddGenFormOff');
+            bus.$emit('sigAddTableFormOff');
         },
+        // NEW STUFF
+        setAddGeneral(){ 
+            // emits a bus signal to toggle the add general form.
+            bus.$emit('sigAddSeatFormOff');
+            bus.$emit('sigEditSeatFormOff');
+            bus.$emit('sigAddGenFormOn');
+            bus.$emit('sigAddTableFormOff');
+        },
+        setAddTable(){ 
+            // emits a bus signal to toggle the add general form.
+            bus.$emit('sigAddSeatFormOff');
+            bus.$emit('sigEditSeatFormOff');
+            bus.$emit('sigAddGenFormOff');
+            bus.$emit('sigAddTableFormOn');
+        },
+        // END OF NEW STUFF
     }
 });
 
@@ -208,13 +182,13 @@ Vue.component('add-general-form',{
         // a "bus stop" signal listener for toggling the visibility of the add seating form.
         bus.$on('sigAddGenFormOn', ()=>{
             this.showAddGenForm = true;
-        })
+        });
 
         // a bus listener for toggling the visibility of both forms when 
         // the delete seating signal is received.
         bus.$on('sigAddGenFormOff',()=>{
             this.showAddGenForm = false;
-        })
+        });
     }, 
 })
 
@@ -228,7 +202,7 @@ Vue.component('add-table-form',{
             xSeats: 5,
             ySeats: 2,
             showAddTableForm: false,
-        }
+        };
     },
     methods:{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
