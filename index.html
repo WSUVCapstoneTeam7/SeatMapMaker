@@ -63,16 +63,17 @@
                 <add-form></add-form>
                 <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
                 <edit-form></edit-form>
+                <!-- NEW STUFF -->
+                <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
+                <add-general-form></add-general-form>
+                <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
+                <add-table-form></add-table-form>            
+                <!-- END OF NEW STUFF -->
                 <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
                 <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
                 <br>
             </div>
-            <!-- NEW STUFF -->
-            <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
-            <add-general-form></add-general-form>
-            <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
-            <add-table-form></add-table-form>            
-            <!-- END OF NEW STUFF -->
+
         </div>
     </template>
 
