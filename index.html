@@ -63,12 +63,10 @@
                 <add-form></add-form>
                 <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
                 <edit-form></edit-form>
-                <!-- NEW STUFF -->
                 <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
                 <add-general-form></add-general-form>
                 <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
                 <add-table-form></add-table-form>            
-                <!-- END OF NEW STUFF -->
                 <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
                 <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
                 <br>
@@ -118,7 +116,6 @@
             <button v-on:click ="submitEditSeating">Submit</button>
         </div>
     </template>
-<!-- NEW STUFF -->
     <template id = "add-general-form">
         <!-- v-show directive makes div invisible if "showGeneralForm" is false -->
         <div v-show="showAddGenForm">
@@ -142,9 +139,13 @@
                 Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
                 <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
                 <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle<br>
-                Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
-                X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
-                Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
+                <div v-show="tableType === 'round'">
+                    Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
+                </div>
+                <div v-show="tableType === 'rect'">
+                    X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
+                    Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
+                </div>
                 <br>
             </form>
             <!-- v-on calls "submitTableData" when a click event is detected on this button -->
@@ -153,7 +154,6 @@
         <p v-show="false"><span>{{showAddTableForm}}</span></p>
         </div>        
     </template>
-<!-- END OF NEW STUFF -->
     <template id = "get-data">
         <div>
             <button v-on:click = "Load Map">GetData</button>
