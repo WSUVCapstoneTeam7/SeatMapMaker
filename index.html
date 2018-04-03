@@ -65,10 +65,10 @@
             <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
             <edit-form></edit-form>
             <!-- NEW STUFF -->
-            <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
-            <add-general-form></add-general-form>
-            <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
-            <add-table-form></add-table-form>            
+            <!--<a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  -->
+            <!--<add-general-form></add-general-form>-->
+            <!--<a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  -->
+            <!--<add-table-form></add-table-form>            -->
             <!-- END OF NEW STUFF -->
             <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
 
@@ -82,15 +82,79 @@
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
                 Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
-                <!--<p>Seating Type</p><br>-->
-                Seating Type: <form>
-                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
-                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
-                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
-                </form>
-                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
-                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
-                <br>
+                <!--Seating Type: <form>-->
+                    <!--<input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP-->
+                    <!--<input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating-->
+                    <!--<input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing-->
+                <!--</form>-->
+                <div class="variableAddMenu">
+                    <div class="radio">
+                        <label class="radio">
+                            <input name="rating" type="radio" v-model="sectionType" value="Seating"/>
+                            Seating
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label class="radio">
+                            <input name="rating" type="radio" v-model="sectionType" value="Table"/>
+                            Table
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label class="radio">
+                            <input name="rating" type="radio" v-model="sectionType" value="General"/>
+                            General Area
+                        </label>
+                    </div>
+                    <template v-if="sectionType != ''">
+                        <div>Seating Type</div>
+                        <div class="radio">
+                            <label class="radio">
+                                <input type="radio" id="seatingType" v-model="seatingType" value="VIP"/>
+                                VIP
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label class="radio">
+                                <input type="radio" id="seatingType" v-model="seatingType" value="Standard"/>
+                                Standard
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label class="radio">
+                                <input type="radio" id="seatingType" v-model="seatingType" value="Economic"/>
+                                Economic
+                            </label>
+                        </div>
+                    </template>
+                    <template v-if="sectionType == 'Seating'">
+                        <div class="form-group hidden">
+                            <label class="standardSeatingDimensions">
+                                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
+                                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
+                            </label>
+                        </div>
+                    </template>
+                    <template v-if="sectionType == 'Table'">
+                        <div class="form-group hidden">
+                            <label class="TableType">
+                                <div>Table Type</div>
+                                <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
+                                <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle
+                            </label>
+                        </div>
+                    </template>
+                    <template v-if="tableType == 'round'">
+                        Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
+                    </template>
+                    <template v-if="tableType == 'rect'">
+                        X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
+                        Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
+
+                    </template>
+                </div>
+
+
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
             <button v-on:click ="submitSeatingData">Submit</button>
@@ -118,40 +182,40 @@
         </div>
     </template>
 <!-- NEW STUFF -->
-    <template id = "add-general-form">
-        <!-- v-show directive makes div invisible if "showGeneralForm" is false -->
-        <div v-show="showAddGenForm">
-            <form>
-                <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
-                <br>
-            </form>
-            <!-- v-on calls "submitGeneralData" when a click event is detected on this button  -->
-            <button v-on:click ="submitGeneralData">Submit</button>
-            <!-- Debugging to see that the form toggle flag is being set -->
-        <p v-show="false"><span>{{showAddGenForm}}</span></p>
-        </div>        
-    </template>
+    <!--<template id = "add-general-form">-->
+        <!--&lt;!&ndash; v-show directive makes div invisible if "showGeneralForm" is false &ndash;&gt;-->
+        <!--<div v-show="showAddGenForm">-->
+            <!--<form>-->
+                <!--&lt;!&ndash; v-model directive binds data from field to data in Vue instance &ndash;&gt;-->
+                <!--Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>-->
+                <!--<br>-->
+            <!--</form>-->
+            <!--&lt;!&ndash; v-on calls "submitGeneralData" when a click event is detected on this button  &ndash;&gt;-->
+            <!--<button v-on:click ="submitGeneralData">Submit</button>-->
+            <!--&lt;!&ndash; Debugging to see that the form toggle flag is being set &ndash;&gt;-->
+        <!--<p v-show="false"><span>{{showAddGenForm}}</span></p>-->
+        <!--</div>        -->
+    <!--</template>-->
 
-    <template id = "add-table-form">
-        <!-- v-show directive makes div invisible if "showTableForm" is false -->
-        <div v-show="showAddTableForm">
-            <form>
-                <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
-                <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
-                <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle<br>
-                Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
-                X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
-                Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
-                <br>
-            </form>
-            <!-- v-on calls "submitTableData" when a click event is detected on this button -->
-            <button v-on:click ="submitTableData">Submit</button>
-            <!-- Debugging to see that the form toggle flag is being set -->
-        <p v-show="false"><span>{{showAddTableForm}}</span></p>
-        </div>        
-    </template>
+    <!--<template id = "add-table-form">-->
+        <!--&lt;!&ndash; v-show directive makes div invisible if "showTableForm" is false &ndash;&gt;-->
+        <!--<div v-show="showAddTableForm">-->
+            <!--<form>-->
+                <!--&lt;!&ndash; v-model directive binds data from field to data in Vue instance &ndash;&gt;-->
+                <!--Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>-->
+                <!--<input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp-->
+                <!--<input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle<br>-->
+                <!--Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>-->
+                <!--X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>-->
+                <!--Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>-->
+                <!--<br>-->
+            <!--</form>-->
+            <!--&lt;!&ndash; v-on calls "submitTableData" when a click event is detected on this button &ndash;&gt;-->
+            <!--<button v-on:click ="submitTableData">Submit</button>-->
+            <!--&lt;!&ndash; Debugging to see that the form toggle flag is being set &ndash;&gt;-->
+        <!--<p v-show="false"><span>{{showAddTableForm}}</span></p>-->
+        <!--</div>        -->
+    <!--</template>-->
 <!-- END OF NEW STUFF -->
     <template id = "get-data">
         <div>

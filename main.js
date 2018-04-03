@@ -15,15 +15,15 @@ Vue.component('app-toolbar',{
             // emits a bus signal to toggle the add seating form.
             bus.$emit('sigAddSeatFormOn');
             bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOff');
+            // bus.$emit('sigAddGenFormOff');
+            // bus.$emit('sigAddTableFormOff');
         },
         setDeleteSeating(){
             // emits a bus signal to toggle both forms off
             bus.$emit('sigAddSeatFormOff');
             bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOff');
+            // bus.$emit('sigAddGenFormOff');
+            // bus.$emit('sigAddTableFormOff');
             // signal the seating to be deleted
             bus.$emit('sigDeleteSeating');
         },
@@ -31,23 +31,23 @@ Vue.component('app-toolbar',{
             // emits a bus signal to toggle the edit seating form
             bus.$emit('sigEditSeatFormOn');
             bus.$emit('sigAddSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOff');
+            // bus.$emit('sigAddGenFormOff');
+            // bus.$emit('sigAddTableFormOff');
         },
         // NEW STUFF
         setAddGeneral(){ 
             // emits a bus signal to toggle the add general form.
             bus.$emit('sigAddSeatFormOff');
             bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOn');
-            bus.$emit('sigAddTableFormOff');
+            // bus.$emit('sigAddGenFormOn');
+            // bus.$emit('sigAddTableFormOff');
         },
         setAddTable(){ 
             // emits a bus signal to toggle the add general form.
             bus.$emit('sigAddSeatFormOff');
             bus.$emit('sigEditSeatFormOff');
-            bus.$emit('sigAddGenFormOff');
-            bus.$emit('sigAddTableFormOn');
+            // bus.$emit('sigAddGenFormOff');
+            // bus.$emit('sigAddTableFormOn');
         },
         // END OF NEW STUFF
     }
@@ -59,9 +59,15 @@ Vue.component('add-form',{
         return{
             sectionName: "",
             sectionType: "",
+            seatingType: "",
             columns: null,
             rows: null,
             showAddSeatForm: false,
+            tableType: "",
+            seats: null,
+            xSeats: null,
+            ySeats: null,
+            sectionColor: "",
         }
     },
     methods:{
@@ -73,10 +79,20 @@ Vue.component('add-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName, this.sectionType);
+            if (this.seatingType == "VIP")
+                color = "green";
+            else if (this.seatingType == "Standard")
+                color = "yellow";
+            else if (this.seatingType == "Economic")
+                color = "red";
+            if (this.sectionType == "Seating")
+                bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName);
+            else if (this.sectionType == "Table")
+                bus.$emit('sigMakeTable',100,100,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName);
+            else if (this.sectionType == "General")
 
-            // set toggle the seating forms visibility since the seating section has been created.
-            this.showAddSeatForm = false;
+            // set toggle the seating forms visibility since the seating section has been created
+            this.showAddSeatForm = true;
         }
     },
     // function that launches when Forms component is created
@@ -115,7 +131,7 @@ Vue.component('edit-form',{
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType)
+                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.seatingType)
             }
         }
     },
@@ -147,84 +163,84 @@ Vue.component('get-data',{
 })
 
 // NEW STUFF
-Vue.component('add-general-form',{
-    template: '#add-general-form',
-    data(){
-        return{
-            sectionName: "test name",
-            showAddGenForm: false,
-        }
-    },
-    methods:{
-        // triggered whenever a button is clicked. emits a sigMakeSeating signal 
-        // and passes location 100,100 and the values collected from the input fields
-        submitGeneralData(){
-            console.log("submit seat data");
-            // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
-            // parameters to make a seating section. This package will get off at
-            // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeGeneral',100,100, this.sectionName);
-
-            // set toggle the seating forms visibility since the seating section has been created.
-            this.showAddGenForm = false;
-        }
-    },
-    // function that launches when Forms component is created
-    // signal listeners must be initialized on component creation
-    created(){
-        // a "bus stop" signal listener for toggling the visibility of the add seating form.
-        bus.$on('sigAddGenFormOn', ()=>{
-            this.showAddGenForm = true;
-        })
-
-        // a bus listener for toggling the visibility of both forms when 
-        // the delete seating signal is received.
-        bus.$on('sigAddGenFormOff',()=>{
-            this.showAddGenForm = false;
-        })
-    }, 
-})
-
-Vue.component('add-table-form',{
-    template: '#add-table-form',
-    data(){
-        return{
-            sectionName: "default name",
-            tableType: "round",
-            seats: 2,
-            xSeats: 5,
-            ySeats: 2,
-            showAddTableForm: false,
-        }
-    },
-    methods:{
-        // triggered whenever a button is clicked. emits a sigMakeSeating signal 
-        // and passes location 100,100 and the values collected from the input fields
-        submitTableData(){
-            // emit a Make Table bus signal; or place a passenger on the bus carrying the 
-            // parameters to make a table. This package will get off at
-            // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeTable',100,100,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName);
-
-            // set toggle the table forms visibility since the table has been created.
-            this.showAddTableForm = false;
-        }
-    },
-    // function that launches when Forms component is created
-    // signal listeners must be initialized on component creation
-    created(){
-        // a "bus stop" signal listener for toggling the visibility of the add table form.
-        bus.$on('sigAddTableFormOn', ()=>{
-            this.showAddTableForm = true;
-        })
-
-        // a bus listener for toggling the visibility of both forms when 
-        // the delete table signal is received.
-        bus.$on('sigAddTableFormOff',()=>{
-            this.showAddTableForm = false;
-        })
-    }, 
-})
+// Vue.component('add-general-form',{
+//     template: '#add-general-form',
+//     data(){
+//         return{
+//             sectionName: "test name",
+//             showAddGenForm: false,
+//         }
+//     },
+//     methods:{
+//         // triggered whenever a button is clicked. emits a sigMakeSeating signal
+//         // and passes location 100,100 and the values collected from the input fields
+//         submitGeneralData(){
+//             console.log("submit seat data");
+//             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
+//             // parameters to make a seating section. This package will get off at
+//             // the bus.$on (bus stop) and get routed to where it should be delivered.
+//             bus.$emit('sigMakeGeneral',100,100, this.sectionName);
+//
+//             // set toggle the seating forms visibility since the seating section has been created.
+//             this.showAddGenForm = false;
+//         }
+//     },
+//     // function that launches when Forms component is created
+//     // signal listeners must be initialized on component creation
+//     created(){
+//         // a "bus stop" signal listener for toggling the visibility of the add seating form.
+//         bus.$on('sigAddGenFormOn', ()=>{
+//             this.showAddGenForm = true;
+//         })
+//
+//         // a bus listener for toggling the visibility of both forms when
+//         // the delete seating signal is received.
+//         bus.$on('sigAddGenFormOff',()=>{
+//             this.showAddGenForm = false;
+//         })
+//     },
+// })
+//
+// Vue.component('add-table-form',{
+//     template: '#add-table-form',
+//     data(){
+//         return{
+//             sectionName: "default name",
+//             tableType: "round",
+//             seats: 2,
+//             xSeats: 5,
+//             ySeats: 2,
+//             showAddTableForm: false,
+//         }
+//     },
+//     methods:{
+//         // triggered whenever a button is clicked. emits a sigMakeSeating signal
+//         // and passes location 100,100 and the values collected from the input fields
+//         submitTableData(){
+//             // emit a Make Table bus signal; or place a passenger on the bus carrying the
+//             // parameters to make a table. This package will get off at
+//             // the bus.$on (bus stop) and get routed to where it should be delivered.
+//             bus.$emit('sigMakeTable',100,100,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName);
+//
+//             // set toggle the table forms visibility since the table has been created.
+//             this.showAddTableForm = false;
+//         }
+//     },
+//     // function that launches when Forms component is created
+//     // signal listeners must be initialized on component creation
+//     created(){
+//         // a "bus stop" signal listener for toggling the visibility of the add table form.
+//         bus.$on('sigAddTableFormOn', ()=>{
+//             this.showAddTableForm = true;
+//         })
+//
+//         // a bus listener for toggling the visibility of both forms when
+//         // the delete table signal is received.
+//         bus.$on('sigAddTableFormOff',()=>{
+//             this.showAddTableForm = false;
+//         })
+//     },
+// })
 
 // NEW STUFF
 var vm = new Vue({
@@ -243,6 +259,7 @@ var vm = new Vue({
         },
          //  makes the seating sections
         makeSeating:function(posX, posY, cols, rows, name, type) {
+
             var rad = 10,
             dia = rad*2,
             gap = 5,
@@ -253,7 +270,7 @@ var vm = new Vue({
             sizeY = topBuff + bottomBuff + rows*dia + (rows-1)*gap;
     
             var items = [];
-    
+            console.log(type)
             var container = new fabric.Rect({
             left: posX,
             top: posY,
@@ -266,13 +283,13 @@ var vm = new Vue({
             });
     
             var text = new fabric.IText(name, {
-            fontSize: 20,
-            fontFamily: 'sans-serif',
-            left: (posX+(sizeX/2)),
-            top: (posY+10),
-            originX: 'center', 
-            originY: 'top',
-            hasControls: false	
+                fontSize: 20,
+                fontFamily: 'sans-serif',
+                left: (posX+(sizeX/2)),
+                top: (posY+10),
+                originX: 'center',
+                originY: 'top',
+                hasControls: false
             });
     
             // resize container to accomodate text (maybe just make text box first?)
@@ -280,32 +297,26 @@ var vm = new Vue({
     
             items.push(container);
             items.push(text);
-            var color = "";
-            if (type == "VSeating")
-                color = "green";
-            else if (type == "NSeating")
-                color = "yellow";
-            else if (type == "Standing")
-                color = "red";
+
             for (var i=0; i < rows; i++) {
-            for (var j=0; j < cols; j++) {
-                console.log("adding circle");
-                var circle = new fabric.Circle({
-                radius: rad,
-                left: posX, 
-                top: posY,
-                left: (posX + sideBuff) + rad + j*dia + j*gap, 
-                top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
-                originX: 'center',
-                originY: 'center',
-                fill: color,
-                });
-                items.push(circle);
-            }
+                for (var j=0; j < cols; j++) {
+                    console.log("adding circle");
+                    var circle = new fabric.Circle({
+                    radius: rad,
+                    left: posX,
+                    top: posY,
+                    left: (posX + sideBuff) + rad + j*dia + j*gap,
+                    top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
+                    originX: 'center',
+                    originY: 'center',
+                    fill: color,
+                    });
+                    items.push(circle);
+                }
             }
             var group = new fabric.Group(items, {
-            lockScalingX: true,
-            lockScalingY: true	
+                lockScalingX: true,
+                lockScalingY: true
             });
             // this.seatArray.push(group);
             fabCanvas.add(group);
@@ -379,6 +390,9 @@ var vm = new Vue({
             fabCanvas.renderAll();
         },
         makeTable:function(posX, posY, type, seats, xSeats, ySeats, name) {
+            console.log("Color is " + color);
+            console.log("Number of seats is " + this.seats)
+            console.log("Table type is " + this.tableType)
             // make sure seat numbers are integers
             xSeats = parseInt(xSeats);
             ySeats = parseInt(ySeats);
@@ -472,7 +486,7 @@ var vm = new Vue({
                     for (var i = 0; i < xSeats; i++) {
                         var circleT = new fabric.Circle({
                             radius: rad, 
-                            fill: 'green', 
+                            fill: color,
                             left: leftStart + dia*i + gap*i, 
                             top: topPos,
                             originX: 'center',
@@ -480,7 +494,7 @@ var vm = new Vue({
                         });
                         var circleB = new fabric.Circle({
                             radius: rad, 
-                            fill: 'green', 
+                            fill: color,
                             left: leftStart + dia*i + gap*i, 
                             top: bottomPos,
                             originX: 'center',
@@ -499,7 +513,7 @@ var vm = new Vue({
                     for (var i = 0; i < ySeats; i++) {
                         var circleL = new fabric.Circle({
                             radius: rad, 
-                            fill: 'green', 
+                            fill: color,
                             left: leftPos,
                             top: topStart + dia*i + gap*i,
                             originX: 'center',
@@ -507,7 +521,7 @@ var vm = new Vue({
                         });
                         var circleR = new fabric.Circle({
                             radius: rad,
-                            fill: 'green', 
+                            fill: color,
                             left: rightPos,
                             top: topStart + dia*i + gap*i,
                             originX: 'center',
@@ -520,6 +534,7 @@ var vm = new Vue({
             } // if table = rect
 
             if (type == 'round') {
+                console.log(color);
                 // calculate the size of the table
                 var tableRad = rad + gap;
                 if (seats >= 4 && seats < 6)
@@ -568,7 +583,7 @@ var vm = new Vue({
 
                     var circle = new fabric.Circle({
                         radius: rad, 
-                        fill: 'green', 
+                        fill: color,
                         left: xPos,
                         top: yPos,
                         originX: 'center',
