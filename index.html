@@ -64,12 +64,6 @@
             <add-form></add-form>
             <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
             <edit-form></edit-form>
-            <!-- NEW STUFF -->
-            <!--<a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  -->
-            <!--<add-general-form></add-general-form>-->
-            <!--<a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  -->
-            <!--<add-table-form></add-table-form>            -->
-            <!-- END OF NEW STUFF -->
             <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
 
             <br>
@@ -82,48 +76,22 @@
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
                 Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
-                <!--Seating Type: <form>-->
-                    <!--<input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP-->
-                    <!--<input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating-->
-                    <!--<input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing-->
-                <!--</form>-->
                 <div class="variableAddMenu">
+                    <div>Area Type</div>
                     <div class="radio">
                         <label class="radio">
-                            <input name="rating" type="radio" v-model="sectionType" value="Seating"/>
-                            Seating
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label class="radio">
-                            <input name="rating" type="radio" v-model="sectionType" value="Table"/>
-                            Table
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label class="radio">
-                            <input name="rating" type="radio" v-model="sectionType" value="General"/>
-                            General Area
+                            Seating <input name="rating" type="radio" v-model="sectionType" value="Seating"/>
+                            Table <input name="rating" type="radio" v-model="sectionType" value="Table"/>
+                            General Area <input name="rating" type="radio" v-model="sectionType" value="General"/>
                         </label>
                     </div>
                     <template v-if="sectionType != ''">
                         <div>Seating Type</div>
                         <div class="radio">
                             <label class="radio">
-                                <input type="radio" id="seatingType" v-model="seatingType" value="VIP"/>
-                                VIP
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label class="radio">
-                                <input type="radio" id="seatingType" v-model="seatingType" value="Standard"/>
-                                Standard
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label class="radio">
-                                <input type="radio" id="seatingType" v-model="seatingType" value="Economic"/>
-                                Economic
+                                VIP <input type="radio" id="seatingType" v-model="seatingType" value="VIP"/>
+                                Standard <input type="radio" id="seatingType" v-model="seatingType" value="Standard"/>
+                                Economic <input type="radio" id="seatingType" v-model="seatingType" value="Economic"/>
                             </label>
                         </div>
                     </template>
@@ -136,21 +104,24 @@
                         </div>
                     </template>
                     <template v-if="sectionType == 'Table'">
-                        <div class="form-group hidden">
-                            <label class="TableType">
+                        <div class="radio">
+                            <label class="radio">
                                 <div>Table Type</div>
-                                <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
-                                <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle
+                                Round <input type="radio" id="tableType" value="round" v-model="tableType">
+                                Rectangle <input type="radio" id="tableType" value="rect" v-model="tableType">
                             </label>
                         </div>
                     </template>
-                    <template v-if="tableType == 'round'">
-                        Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
+                    <template v-if="tableType == 'round'  && sectionType == 'Table'">
+                        <div class="form-group hidden">
+                            <label class="tableDimensions">
+                                Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats" placeholder="#"></input>
+                            </label>
+                        </div>
                     </template>
-                    <template v-if="tableType == 'rect'">
-                        X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
-                        Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
-
+                    <template v-if="tableType == 'rect' && sectionType == 'Table'">
+                        X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats" placeholder="#"></input>
+                        Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats" placeholder="#"></input>
                     </template>
                 </div>
 
