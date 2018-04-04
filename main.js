@@ -159,6 +159,7 @@ Vue.component('add-general-form',{
     data(){
         return{
             sectionName: "test name",
+            sectionColor: "ffffff",
             showAddGenForm: false,
         }
     },
@@ -170,7 +171,7 @@ Vue.component('add-general-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeGeneral',100,100, this.sectionName);
+            bus.$emit('sigMakeGeneral',100,100,300,200, this.sectionName, this.sectionColor);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddGenForm = false;
@@ -339,10 +340,8 @@ var vm = new Vue({
         },
 
 // NEW STUFF
-        makeGeneral:function(posX, posY, name) {
-            sizeX = 300,
-            sizeY = 200;
-    
+        makeGeneral:function(posX, posY, sizeX, sizeY, name, color) {
+
             var items = [];
     
             var container = new fabric.Rect({
@@ -351,9 +350,10 @@ var vm = new Vue({
             originX: 'left',
             originY: 'top',
             stroke: 'black',
-            fill: 'transparent',
+            fill: '#' + color,
             width: sizeX,
             height: sizeY,
+            objectCaching: false
             });
     
             var text = new fabric.IText(name, {
@@ -363,7 +363,8 @@ var vm = new Vue({
             top: (posY+(sizeY/2)),
             originX: 'center', 
             originY: 'top',
-            hasControls: false  
+            hasControls: false,
+            objectCashing: false 
             });
     
             items.push(container);
@@ -376,6 +377,39 @@ var vm = new Vue({
             // this.seatArray.push(group);
             fabCanvas.add(group);
             fabCanvas.renderAll();
+
+            // ungroup objects in group
+            var groupItems = []
+            var ungroup = function (group) {
+                console.log("in ungroup()");
+                groupItems = group._objects;
+                group._restoreObjectsState();
+                fabCanvas.remove(group);
+                for (var i = 0; i < groupItems.length; i++) {
+                    fabCanvas.add(groupItems[i]);
+                    items[i].dirty = true;
+                    fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+                }
+                // if you have disabled render on addition
+                fabCanvas.renderAll();
+            };
+
+            group.on('modified', function(opt) {
+                ungroup(group)
+                // get info from current objects
+                var sizeX = container.getWidth()                
+                var sizeY = container.getHeight()
+                var posX = container.left
+                var posY = container.top
+                var color = container.fill.slice(1)
+                var name = text.get('text')
+                // remove current objects
+                fabCanvas.remove(container);
+                fabCanvas.remove(text);
+                // create new object
+                bus.$emit('sigMakeGeneral', posX, posY, sizeX, sizeY, name, color)
+            })
+
         },
         makeTable:function(posX, posY, type, seats, xSeats, ySeats, name) {
             // make sure seat numbers are integers
@@ -606,8 +640,8 @@ var vm = new Vue({
         });
 // NEW STUFF
         // listens for a signal saying to create a new general section
-        bus.$on('sigMakeGeneral', (posX, posY, name)=>{
-            this.makeGeneral(posX, posY, name);
+        bus.$on('sigMakeGeneral', (posX, posY, sizeX, sizeY, name, color)=>{
+            this.makeGeneral(posX, posY, sizeX, sizeY, name, color);
         });
         bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name)=>{
             this.makeTable(posX, posY, type, seats, xSeats, ySeats, name);
