@@ -238,7 +238,8 @@ Vue.component('add-table-form',{
 var vm = new Vue({
     el: '#vue-app',
     data: {
-        mapData: {},
+        // associates a fabric group with the price for the section
+        group_price_array: {},
     },
     methods: {
         GenerateSectionListItem(p) {
