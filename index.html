@@ -63,10 +63,15 @@
                 <add-form></add-form>
                 <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
                 <edit-form></edit-form>
+                <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
+                <add-general-form></add-general-form>
+                <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
+                <add-table-form></add-table-form>            
                 <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
                 <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
                 <br>
             </div>
+
         </div>
     </template>
 
@@ -109,6 +114,53 @@
                 <br>
             </form> 
             <button v-on:click ="submitEditSeating">Submit</button>
+        </div>
+    </template>
+    <template id = "add-general-form">
+        <!-- v-show directive makes div invisible if "showGeneralForm" is false -->
+        <div v-show="showAddGenForm">
+            <form>
+                <!-- v-model directive binds data from field to data in Vue instance -->
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
+                Color: <input id="addBG" value="ffffff" v-model = "sectionColor"></input><br>
+                <br>
+            </form>
+            <!-- v-on calls "submitGeneralData" when a click event is detected on this button  -->
+            <button v-on:click ="submitGeneralData">Submit</button>
+            <!-- Debugging to see that the form toggle flag is being set -->
+        <p v-show="false"><span>{{showAddGenForm}}</span></p>
+        </div>        
+    </template>
+
+    <template id = "add-table-form">
+        <!-- v-show directive makes div invisible if "showTableForm" is false -->
+        <div v-show="showAddTableForm">
+            <form>
+                <!-- v-model directive binds data from field to data in Vue instance -->
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
+                <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
+                <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle<br>
+                <div v-show="tableType === 'round'">
+                    Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
+                </div>
+                <div v-show="tableType === 'rect'">
+                    X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
+                    Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
+                </div>
+                <br>
+            </form>
+            <!-- v-on calls "submitTableData" when a click event is detected on this button -->
+            <button v-on:click ="submitTableData">Submit</button>
+            <!-- Debugging to see that the form toggle flag is being set -->
+        <p v-show="false"><span>{{showAddTableForm}}</span></p>
+        </div>        
+    </template>
+    <template id = "get-data">
+        <div>
+            <button v-on:click = "Load Map">GetData</button>
+            <br>
+            <button v-on:click = "Save Map">postData</button>
+            <!-- <a v-for = "(blog,index) in blogs" v-bind:key ="index">{{blog.title}}</a> -->
         </div>
     </template>
     <script src="main.js"></script>
