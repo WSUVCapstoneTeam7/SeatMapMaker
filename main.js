@@ -239,7 +239,7 @@ var vm = new Vue({
     el: '#vue-app',
     data: {
         // associates a fabric group with the price for the section
-        group_price_array: {},
+        group_price_array: [],
     },
     methods: {
         createGroupPriceElement(userPrice, fabricObject){
@@ -324,6 +324,11 @@ var vm = new Vue({
                 lockScalingY: true
             });
             // this.seatArray.push(group);
+            
+            this.group_price_array.push(this.createGroupPriceElement(price, group));
+            printGroupPriceArray();
+            
+
             fabCanvas.add(group);
             fabCanvas.renderAll();
             // SEE BELOW LINE: how to attach functions to act on objects given a certain event
@@ -633,17 +638,24 @@ var vm = new Vue({
                 lockScalingY: true  
             });
             // this.seatArray.push(group);
+            
             fabCanvas.add(group);
             fabCanvas.renderAll();        
         },
+        printGroupPriceArray(){
+            for(var ii = 0; ii < this.group_price_array.length; ii++){
+                console.log("make seating - group_price_array:");
+                console.log(this.group_price_array[ii]);
+            }
+        }
 // END OF NEW STUFF
 
     },
     created() {
         // listens for a signal saying to create a new seating section
-        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type) => {
-            console.log(fabCanvas);
-            this.makeSeating(posX, posY, cols, rows, name, type);
+        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type, price) => {
+            // console.log(fabCanvas);
+            this.makeSeating(posX, posY, cols, rows, name, type, price);
 
         });
 
