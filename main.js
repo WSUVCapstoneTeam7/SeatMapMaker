@@ -27,7 +27,7 @@ Vue.component('add-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating', 100, 100, this.columns, this.rows, this.sectionName, this.sectionType);
+            bus.$emit('sigMakeSeating', 100, 100, this.columns, this.rows, this.sectionName, this.sectionType, 100);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -68,7 +68,7 @@ Vue.component('edit-form', {
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType)
+                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType, 100);
             }
         }
     },
@@ -254,7 +254,7 @@ var vm = new Vue({
         // GenerateSeatListItem(j, c, p) { //CNF: Price is in both seat and section to help editor and viewers.
         //     return { seatID: j, fabCircle: c, isSold: false, price: p }
         // },
-        makeSeating: function (posX, posY, cols, rows, name, type) {
+        makeSeating: function (posX, posY, cols, rows, name, type, price) {
             var rad = 10,
                 dia = rad * 2,
                 gap = 5,
@@ -300,9 +300,9 @@ var vm = new Vue({
             else if (type == "Standing")
                 color = "red";
             for (var i = 0; i < rows; i++) {
-                section_list_item.rows.push(this.GenerateRowListItem(i)); //CNF
-                var row_list_length = section_list_item.rows.length;  //CNF
-                var row_list_item = section_list_item.rows[row_list_length - 1];  //CNF
+                // section_list_item.rows.push(this.GenerateRowListItem(i)); //CNF
+                // var row_list_length = section_list_item.rows.length;  //CNF
+                // var row_list_item = section_list_item.rows[row_list_length - 1];  //CNF
                 for (var j = 0; j < cols; j++) {
                     console.log("adding circle");
                     var circle = new fabric.Circle({
@@ -316,7 +316,7 @@ var vm = new Vue({
                         fill: color,
                     });
                     items.push(circle);
-                    row_list_item.seats.push(this.GenerateSeatListItem(j, circle, price)); //CNF
+                    // row_list_item.seats.push(this.GenerateSeatListItem(j, circle, price)); //CNF
                 }
             }
             var group = new fabric.Group(items, {
