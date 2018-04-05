@@ -242,15 +242,18 @@ var vm = new Vue({
         group_price_array: {},
     },
     methods: {
-        GenerateSectionListItem(p) {
-            return { sectionID: "", price: p, rows: [], fabText: null, fabRect: null }
+        createGroupPriceElement(userPrice, fabricObject){
+            return {price: userPrice, sectionGroupObject: fabricObject};
         },
-        GenerateRowListItem(i) {
-            return { rowID: i, seats: [] }
-        },
-        GenerateSeatListItem(j, c, p) { //CNF: Price is in both seat and section to help editor and viewers.
-            return { seatID: j, fabCircle: c, isSold: false, price: p }
-        },
+        // GenerateSectionListItem(p) {
+        //     return { sectionID: "", price: p, rows: [], fabText: null, fabRect: null }
+        // },
+        // GenerateRowListItem(i) {
+        //     return { rowID: i, seats: [] }
+        // },
+        // GenerateSeatListItem(j, c, p) { //CNF: Price is in both seat and section to help editor and viewers.
+        //     return { seatID: j, fabCircle: c, isSold: false, price: p }
+        // },
         makeSeating: function (posX, posY, cols, rows, name, type) {
             var rad = 10,
                 dia = rad * 2,
