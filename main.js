@@ -442,7 +442,7 @@ var vm = new Vue({
             });
 
         },
-        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name) {
+        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, price) {
             // make sure seat numbers are integers
             xSeats = parseInt(xSeats);
             ySeats = parseInt(ySeats);
