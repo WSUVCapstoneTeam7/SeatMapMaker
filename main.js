@@ -396,15 +396,25 @@ var vm = new Vue({
             lockScalingY: false  
             });
             // this.seatArray.push(group);
+            // adds table group to group_price_array as a groupPriceElement
+            this.group_price_array.push(this.createGroupPriceElement(price, group));
+            this.printGroupPriceArray();
+            // add table group to fabric canvas for rendering
             fabCanvas.add(group);
             fabCanvas.renderAll();
 
             // ungroup objects in group
             var groupItems = []
             var ungroup = function (group) {
+                
+
                 console.log("in ungroup()");
                 groupItems = group._objects;
                 group._restoreObjectsState();
+                
+                // remove group from price group array 
+                vm.removePriceGroupElement(group);
+
                 fabCanvas.remove(group);
                 for (var i = 0; i < groupItems.length; i++) {
                     fabCanvas.add(groupItems[i]);
