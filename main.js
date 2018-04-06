@@ -642,13 +642,14 @@ var vm = new Vue({
                 }
             }
 
-    
             var group = new fabric.Group(items, {
                 lockScalingX: true,
                 lockScalingY: true  
             });
             // this.seatArray.push(group);
-            
+            this.group_price_array.push(this.createGroupPriceElement(price, group));
+            console.log("Added Table to group_price array.");
+            this.printGroupPriceArray();
             fabCanvas.add(group);
             fabCanvas.renderAll();        
         },
@@ -672,7 +673,6 @@ var vm = new Vue({
                 }
             }
         }
-
     },
     created() {
         // listens for a signal saying to create a new seating section
