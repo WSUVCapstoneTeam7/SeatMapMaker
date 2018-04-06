@@ -326,7 +326,7 @@ var vm = new Vue({
             // this.seatArray.push(group);
             
             this.group_price_array.push(this.createGroupPriceElement(price, group));
-            printGroupPriceArray();
+            this.printGroupPriceArray();
             
 
             fabCanvas.add(group);
@@ -346,7 +346,9 @@ var vm = new Vue({
             // gets the currently active square
             var seatingToDelete = fabCanvas.getActiveObject();
             console.log("This is Rect to Delete From Fabric: " + seatingToDelete);
+            vm.removePriceGroupElement(seatingToDelete);
             fabCanvas.remove(seatingToDelete);
+
             fabCanvas.renderAll();
         },
         post:function(){
