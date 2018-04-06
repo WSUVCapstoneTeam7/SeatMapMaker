@@ -67,7 +67,7 @@ Vue.component('edit-form', {
             console.log(fabCanvas.getActiveObject().calcCoords())
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
-                vm.deleteSeating()
+                vm.deleteSeating();
                 vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType, 100);
             }
         }
@@ -361,7 +361,7 @@ var vm = new Vue({
         },
 
 // NEW STUFF
-        makeGeneral:function(posX, posY, sizeX, sizeY, name, color) {
+        makeGeneral:function(posX, posY, sizeX, sizeY, name, color, price) {
 
             var items = [];
     
