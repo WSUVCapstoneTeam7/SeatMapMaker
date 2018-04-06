@@ -426,20 +426,20 @@ var vm = new Vue({
             };
 
             group.on('modified', function(opt) {
-                ungroup(group)
+                ungroup(group);
                 // get info from current objects
-                var sizeX = container.getWidth()                
-                var sizeY = container.getHeight()
-                var posX = container.left
-                var posY = container.top
-                var color = container.fill.slice(1)
-                var name = text.get('text')
+                var sizeX = container.getWidth();
+                var sizeY = container.getHeight();
+                var posX = container.left;
+                var posY = container.top;
+                var color = container.fill.slice(1);
+                var name = text.get('text');
                 // remove current objects
                 fabCanvas.remove(container);
                 fabCanvas.remove(text);
                 // create new object
                 bus.$emit('sigMakeGeneral', posX, posY, sizeX, sizeY, name, color)
-            })
+            });
 
         },
         makeTable:function(posX, posY, type, seats, xSeats, ySeats, name) {
@@ -653,12 +653,25 @@ var vm = new Vue({
             fabCanvas.renderAll();        
         },
         printGroupPriceArray(){
+            console.log("printGroupPriceArray - group_price_array:");
             for(var ii = 0; ii < this.group_price_array.length; ii++){
-                console.log("make seating - group_price_array:");
                 console.log(this.group_price_array[ii]);
             }
+        },
+        removePriceGroupElement(group){
+            // console.log("removePriceGroupElement: Removing Group");
+            // console.log(group);
+            for(var ii = 0; ii < this.group_price_array.length; ii++){
+                // console.log("removePriceGroupElement: test element");
+                // console.log(this.group_price_array[ii]);
+                if (this.group_price_array[ii].sectionGroupObject == group){
+                    // console.log("Found Element to remove");
+                    this.group_price_array.splice(ii,1);
+                    // console.log("group_price_array element removed:");
+                    // console.log(this.group_price_array);
+                }
+            }
         }
-// END OF NEW STUFF
 
     },
     created() {
