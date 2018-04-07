@@ -157,7 +157,6 @@ Vue.component('drop-down-menu', {
             }
             
 
-            // old download code
             var fileName = "seat-map.json";
             var jsonString = JSON.stringify(seatMapJSONArray);
 
