@@ -63,10 +63,10 @@ Vue.component('edit-form', {
     },
     methods: {
         submitEditSeating() {
-            console.log(fabCanvas.getActiveObject())
-            console.log(fabCanvas.getActiveObject().calcCoords())
+            console.log(fabCanvas.getActiveObject());
+            console.log(fabCanvas.getActiveObject().calcCoords());
             if (fabCanvas.getActiveObject() != null) {
-                var coords = fabCanvas.getActiveObject().calcCoords()
+                var coords = fabCanvas.getActiveObject().calcCoords();
                 vm.deleteSeating();
                 vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType, 100);
             }
@@ -243,7 +243,7 @@ var vm = new Vue({
     },
     methods: {
         createGroupPriceElement(userPrice, fabricObject){
-            return {price: userPrice, sectionGroupObject: fabricObject};
+            return {price: userPrice, fabricGroupObject: fabricObject};
         },
         // GenerateSectionListItem(p) {
         //     return { sectionID: "", price: p, rows: [], fabText: null, fabRect: null }
@@ -409,7 +409,6 @@ var vm = new Vue({
             var groupItems = []
             var ungroup = function (group) {
                 
-
                 console.log("in ungroup()");
                 groupItems = group._objects;
                 group._restoreObjectsState();
@@ -667,14 +666,16 @@ var vm = new Vue({
             for(var ii = 0; ii < this.group_price_array.length; ii++){
                 // console.log("removePriceGroupElement: test element");
                 // console.log(this.group_price_array[ii]);
-                if (this.group_price_array[ii].sectionGroupObject == group){
+                if (this.group_price_array[ii].fabricGroupObject == group){
                     // console.log("Found Element to remove");
                     this.group_price_array.splice(ii,1);
                     // console.log("group_price_array element removed:");
                     // console.log(this.group_price_array);
                 }
             }
-        }
+        },
+        
+        
     },
     created() {
         // listens for a signal saying to create a new seating section
@@ -697,7 +698,6 @@ var vm = new Vue({
             this.makeTable(posX, posY, type, seats, xSeats, ySeats, name);
         });
 // END OF NEW STUFF
-
         // loads a canvas instance from the data store in seat-map.json
         $.getJSON("./seat-map.json", function (data) {
             fabCanvas.loadFromJSON(data);
