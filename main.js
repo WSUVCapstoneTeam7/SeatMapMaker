@@ -97,8 +97,69 @@ Vue.component('drop-down-menu', {
             });
         },
         downloadStuff() {
+            // an array that will be stringify'd at the end of this function
+            seatMapJSONArray = [];
+            // iterate through each group price element in the array
+            for(var ii = 0; ii < vm.group_price_array.length; ii++){
+                // store the iith groupPriceElement
+                var groupPriceElement = vm.group_price_array[ii];
+                // store the elements price
+                var groupPrice = groupPriceElement.price;
+                // get the elements section fabric object
+                var fabricGroupObject = groupPriceElement.fabricGroupObject;
+                // get an array of the fabric objects in the group
+                var groupItems = fabricGroupObject.getObjects();
+                console.log("downloadStuff groupItems:");
+                // check if there are only 2 items in which case it is a general area
+                var isGeneralArea = false;
+                if(groupItems.length == 2){
+                    // general Area
+                    console.log("this is a general Area");
+                    isGeneralArea = true;
+                }
+                //  iterate through the objects in the group
+                for(var jj = 0; jj < groupItems.length; jj++){
+                    // store the fabric object
+                    var fabObject = groupItems[jj];
+                    // store the objects color
+                    var fabObjectColor = fabObject.fill;
+                    // store the element type
+                    var fabObjectType = fabObject.type;
+                    console.log("object type");
+                    console.log(fabObjectType);
+                    console.log(fabObjectColor);
+                    // check if the fabObject
+                    if (fabObjectType == "circle"){
+                        if(fabObjectColor != "white"){
+                            console.log("this is a seat");
+                            if(groupPrice == undefined){
+                                groupPrice = 0;
+                            }
+                            var seatElement = {price: groupPrice, fabObject: fabObject};
+                            seatMapJSONArray.push(seatElement);
+                        }else{
+                            console.log("this is a table.");
+                            seatMapJSONArray.push(fabObject);
+                        }
+                    }
+                    else if ((fabObjectType == "rect")&&(isGeneralArea)){
+                        if(groupPrice == undefined){
+                            groupPrice = 0;
+                        }
+                        var generalAreaElement = {price: groupPrice, fabObject: fabObject};
+                        seatMapJSONArray.push(generalAreaElement);
+                    }else{
+                        seatMapJSONArray.push(fabObject);
+                    }
+                    console.log("seatMapJSONArray: ");
+                    console.log(seatMapJSONArray);
+                }
+            }
+            
+
+            // old download code
             var fileName = "seat-map.json";
-            var jsonString = JSON.stringify(fabCanvas);
+            var jsonString = JSON.stringify(seatMapJSONArray);
 
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
