@@ -4,8 +4,19 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth( window.innerWidth );
 fabCanvas.setHeight( window.innerHeight);
 
+// resize canvas when window resizes
+$(window).resize(function() {
+    fabCanvas.setWidth( window.innerWidth );
+    fabCanvas.setHeight( window.innerHeight);
+    fabCanvas.calcOffset();
+});
+
 
 var bus = new Vue();
+
+// where to create new objects
+var startX = 200;
+var startY = 100
 
 Vue.component('add-form',{
     template: '#add-form',
@@ -27,7 +38,7 @@ Vue.component('add-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',100,100,this.columns, this.rows, this.sectionName, this.sectionType);
+            bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.sectionType);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -149,11 +160,9 @@ Vue.component('drop-down-menu',{
             bus.$emit('sigAddGenFormOff');
             bus.$emit('sigAddTableFormOn');
         },
-        // END OF NEW STUFF
     }
 });
 
-// NEW STUFF
 Vue.component('add-general-form',{
     template: '#add-general-form',
     data(){
@@ -171,7 +180,7 @@ Vue.component('add-general-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeGeneral',100,100,300,200, this.sectionName, this.sectionColor);
+            bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.sectionColor);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddGenForm = false;
@@ -212,7 +221,7 @@ Vue.component('add-table-form',{
             // emit a Make Table bus signal; or place a passenger on the bus carrying the 
             // parameters to make a table. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeTable',100,100,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName);
+            bus.$emit('sigMakeTable',startX,startY,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName);
 
             // set toggle the table forms visibility since the table has been created.
             this.showAddTableForm = false;
@@ -234,7 +243,6 @@ Vue.component('add-table-form',{
     }, 
 })
 
-// NEW STUFF
 var vm = new Vue({
     el:'#vue-app',
     data:{
@@ -259,7 +267,7 @@ var vm = new Vue({
             top: posY,
             originX: 'left',
             originY: 'top',
-            stroke: 'black',
+            stroke: 'transparent',
             fill: 'transparent',
             width: sizeX,
             height: sizeY,
@@ -310,15 +318,6 @@ var vm = new Vue({
             // this.seatArray.push(group);
             fabCanvas.add(group);
             fabCanvas.renderAll();
-            // SEE BELOW LINE: how to attach functions to act on objects given a certain event
-        /*	group.on('mousedown', fabricDblClick(group, function (obj) {
-            ungroup(group);
-            canvas.setActiveObject(text);
-            text.enterEditing();
-            text.selectAll();
-            })); */
-            // SEE OLD CODE: "Double-click text editing" for full code
-        
         },
         // removes the currently selected Seat Selection from the fabCanvas.
         deleteSeating:function(){
@@ -339,7 +338,6 @@ var vm = new Vue({
             });
         },
 
-// NEW STUFF
         makeGeneral:function(posX, posY, sizeX, sizeY, name, color) {
 
             var items = [];
@@ -349,7 +347,7 @@ var vm = new Vue({
             top: posY,
             originX: 'left',
             originY: 'top',
-            stroke: 'black',
+            stroke: 'transparent',
             fill: '#' + color,
             width: sizeX,
             height: sizeY,
@@ -434,10 +432,21 @@ var vm = new Vue({
             top: posY,
             originX: 'left',
             originY: 'top',
-            stroke: 'black',
+            stroke: 'transparent',
             fill: 'transparent',
             width: sizeX,
             height: sizeY,
+            });
+
+            container.on('mouse:over', function(e) {
+                e.target.set('stroke', 'black');
+                fabCanvas.renderAll();
+            });
+
+            container.on('mouse:out', function(e) {
+                console.log(typeof(e));
+                e.target.set('stroke', 'transparent');
+                fabCanvas.renderAll();
             });
     
             var text = new fabric.IText(name, {
@@ -451,14 +460,13 @@ var vm = new Vue({
             });  
 
             if (type == 'rect') {
-/* Need something right here to check if total seats is 2 and make table smaller */
 
                 // calculate height and width of table
-                var tableWidth = (2*dia) + (3*gap); // 55 by default
+                var tableWidth = (1*dia) + (2*gap); // 55 by default
                 var tableHeight = tableWidth;       // 55 by default
-                if (xSeats >= 2)
+                if (xSeats >= 1)
                     tableWidth = (xSeats*dia) + ((xSeats+1)*gap);
-                if (ySeats >= 2)
+                if (ySeats >= 1)
                     tableHeight = (ySeats*dia) + ((ySeats+1)*gap);
 
                 wholeWidth = tableWidth;
@@ -526,7 +534,7 @@ var vm = new Vue({
 
                 // build chairs along y axis
                 if (ySeats > 0) {
-                    var topStart = (text.top + text.height + topBuff) + (wholeHeight-tableHeight)/2 + rad;
+                    var topStart = (text.top + text.height + topBuff) + (wholeHeight-tableHeight)/2 + gap + rad;
                     var leftPos = table.left - tableWidth/2 - gap - rad;
                     var rightPos = table.left + tableWidth/2 + gap + rad;
                     for (var i = 0; i < ySeats; i++) {
@@ -610,7 +618,6 @@ var vm = new Vue({
                     items.push(circle);
                 }
             }
-
     
             var group = new fabric.Group(items, {
                 lockScalingX: true,
@@ -618,9 +625,9 @@ var vm = new Vue({
             });
             // this.seatArray.push(group);
             fabCanvas.add(group);
-            fabCanvas.renderAll();        
+            fabCanvas.renderAll();
         },
-// END OF NEW STUFF
+
 
     },
 
@@ -638,7 +645,7 @@ var vm = new Vue({
         bus.$on('sigDeleteSeating', ()=>{
             this.deleteSeating();
         });
-// NEW STUFF
+
         // listens for a signal saying to create a new general section
         bus.$on('sigMakeGeneral', (posX, posY, sizeX, sizeY, name, color)=>{
             this.makeGeneral(posX, posY, sizeX, sizeY, name, color);
@@ -646,7 +653,6 @@ var vm = new Vue({
         bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name)=>{
             this.makeTable(posX, posY, type, seats, xSeats, ySeats, name);
         });
-// END OF NEW STUFF
 
         // loads a canvas instance from the data store in seat-map.json
         $.getJSON( "./seat-map.json", function( data ) {
