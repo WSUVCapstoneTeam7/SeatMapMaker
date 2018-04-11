@@ -11,6 +11,36 @@ $(window).resize(function() {
     fabCanvas.calcOffset();
 });
 
+// canvas zooming
+fabCanvas.on('mouse:wheel', function(opt) {
+    var delta = opt.e.deltaY;
+    var zoom = fabCanvas.getZoom();
+    zoom = zoom + delta/800;
+    if (zoom > 20) zoom = 20;
+    if (zoom < 0.01) zoom = 0.01;
+    fabCanvas.setZoom(zoom);
+    opt.e.preventDefault();
+    opt.e.stopPropagation();
+})
+
+// canvas panning - adapted from http://jsfiddle.net/gncabrera/hkee5L6d/5/
+var panning = false;
+fabCanvas.on('mouse:up', function(e) {
+    panning = false;
+});
+fabCanvas.on('mouse:down', function(e) {
+    if (e.target == null) {
+        panning = true;
+    }
+});
+fabCanvas.on('mouse:move', function (e) {
+    if (panning && e && e.e) {
+        //debugger;
+        var units = 10;
+        var delta = new fabric.Point(e.e.movementX, e.e.movementY);
+        fabCanvas.relativePan(delta);
+    }
+});
 
 var bus = new Vue();
 
@@ -33,8 +63,8 @@ Vue.component('add-form',{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
         submitSeatingData(){
-            console.log("submit seat data");
-            console.log(this.sectionType);
+            //console.log("submit seat data");
+            //console.log(this.sectionType);
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
@@ -339,7 +369,6 @@ var vm = new Vue({
         },
 
         makeGeneral:function(posX, posY, sizeX, sizeY, name, color) {
-
             var items = [];
     
             var container = new fabric.Rect({
@@ -347,7 +376,7 @@ var vm = new Vue({
             top: posY,
             originX: 'left',
             originY: 'top',
-            stroke: 'transparent',
+            stroke: 'black',
             fill: '#' + color,
             width: sizeX,
             height: sizeY,
@@ -379,7 +408,6 @@ var vm = new Vue({
             // ungroup objects in group
             var groupItems = []
             var ungroup = function (group) {
-                console.log("in ungroup()");
                 groupItems = group._objects;
                 group._restoreObjectsState();
                 fabCanvas.remove(group);
