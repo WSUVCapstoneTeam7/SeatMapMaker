@@ -368,6 +368,8 @@ var vm = new Vue({
                         originY: 'center',
                         fill: color,
                     });
+                    // add price property to circle
+                    this.addPriceToObject(circle,price);
                     items.push(circle);
                     // row_list_item.seats.push(this.GenerateSeatListItem(j, circle, price)); //CNF
                 }
@@ -378,10 +380,6 @@ var vm = new Vue({
             });
             // this.seatArray.push(group);
             
-            this.group_price_array.push(this.createGroupPriceElement(price, group));
-            this.printGroupPriceArray();
-            
-
             fabCanvas.add(group);
             fabCanvas.renderAll();
             // SEE BELOW LINE: how to attach functions to act on objects given a certain event
@@ -395,7 +393,7 @@ var vm = new Vue({
 
         },
         // removes the currently selected Seat Selection from the fabCanvas.
-        deleteSeating: function () {
+        deleteSeating () {
             // gets the currently active square
             var seatingToDelete = fabCanvas.getActiveObject();
             console.log("This is Rect to Delete From Fabric: " + seatingToDelete);
@@ -727,8 +725,15 @@ var vm = new Vue({
                 }
             }
         },
-        
-        
+        addPriceToObject(object, price){
+            object.toObject = (function(toObject){
+                return function(){
+                    return fabric.util.object.extend(toObject.call(this),{
+                        price: price
+                    });
+                };
+            })(object.toObject);
+        }
     },
     created() {
         // listens for a signal saying to create a new seating section
@@ -752,7 +757,7 @@ var vm = new Vue({
         });
 // END OF NEW STUFF
         // loads a canvas instance from the data store in seat-map.json
-        $.getJSON("./seat-map.json", function (data) {
+        $.getJSON("./seat-map-maker.json", function (data) {
             fabCanvas.loadFromJSON(data);
         });
     }
