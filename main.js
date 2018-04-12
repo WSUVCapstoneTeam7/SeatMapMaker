@@ -97,69 +97,71 @@ Vue.component('drop-down-menu', {
             });
         },
         downloadStuff() {
-            // an array that will be stringify'd at the end of this function
-            seatMapJSONArray = [];
-            // iterate through each group price element in the array
-            for(var ii = 0; ii < vm.group_price_array.length; ii++){
-                // store the iith groupPriceElement
-                var groupPriceElement = vm.group_price_array[ii];
-                // store the elements price
-                var groupPrice = groupPriceElement.price;
-                // get the elements section fabric object
-                var fabricGroupObject = groupPriceElement.fabricGroupObject;
-                // get an array of the fabric objects in the group
-                var groupItems = fabricGroupObject.getObjects();
-                console.log("downloadStuff groupItems:");
-                // check if there are only 2 items in which case it is a general area
-                var isGeneralArea = false;
-                if(groupItems.length == 2){
-                    // general Area
-                    console.log("this is a general Area");
-                    isGeneralArea = true;
-                }
-                //  iterate through the objects in the group
-                for(var jj = 0; jj < groupItems.length; jj++){
-                    // store the fabric object
-                    var fabObject = groupItems[jj];
-                    // store the objects color
-                    var fabObjectColor = fabObject.fill;
-                    // store the element type
-                    var fabObjectType = fabObject.type;
-                    console.log("object type");
-                    console.log(fabObjectType);
-                    console.log(fabObjectColor);
-                    // check if the fabObject
-                    if (fabObjectType == "circle"){
-                        if(fabObjectColor != "white"){
-                            console.log("this is a seat");
-                            if(groupPrice == undefined){
-                                groupPrice = 0;
-                            }
-                            var seatElement = {price: groupPrice, fabObject: fabObject};
-                            seatMapJSONArray.push(seatElement);
-                        }else{
-                            console.log("this is a table.");
-                            seatMapJSONArray.push(fabObject);
-                        }
-                    }
-                    else if ((fabObjectType == "rect")&&(isGeneralArea)){
-                        if(groupPrice == undefined){
-                            groupPrice = 0;
-                        }
-                        var generalAreaElement = {price: groupPrice, fabObject: fabObject};
-                        seatMapJSONArray.push(generalAreaElement);
-                    }else{
-                        seatMapJSONArray.push(fabObject);
-                    }
-                    console.log("seatMapJSONArray: ");
-                    console.log(seatMapJSONArray);
+            // download a version of the seat map with all the sections grouped.
+            // this may be unnecessary if we were somehow able to associate a group property
+            // to the objects as well as price. This is a brute force solution.
+            this.performDownload("seat-map-maker.json");
+            // get the group objects as an array
+            const canvasGroupObjects = Array.from(fabCanvas.getObjects());
+            // print canvasGroupObjects
+            console.log("downloadstuff: canvasGroupObjects");
+            console.log(canvasGroupObjects);
+            // store the length because it was dynamically changing as items were added to fabCanvas
+            console.log("canvasObjects length:"+canvasGroupObjects.length);
+            const canvasObjectsLength = canvasGroupObjects.length;
+            var object_groups_array = [];
+            // for each group in the fab canvas
+            for (ii = 0; ii < canvasObjectsLength; ii++){
+                // store the fabric group 
+                var fabricGroup = canvasGroupObjects[ii];
+                // print fabric group type, needs to be group and nothing else
+                console.log(fabricGroup.type);
+                // canvasObjects array was growing before and this was debug to prove 
+                // length grew in middle of for loop causing extra iterations.
+                console.log("iteration of canvas group"+ii);
+                // sets items within a group to their local position not group relative
+                fabricGroup._restoreObjectsState();
+                // get the individual objects from the group
+                var groupObjects = fabricGroup.getObjects();
+                object_groups_array.push(groupObjects);
+                // remove the group from fab canvas
+                fabCanvas.remove(fabricGroup);
+                // for each object in the fabric group
+                // add each of the objects individually into fabcanvas
+                for(var jj = 0; jj < groupObjects.length; jj++){
+                    groupObjects[jj].dirty = true;
+                    fabCanvas.add(groupObjects[jj]);
                 }
             }
+            // download the seat map viewer map with each object seperated from groups
+            this.performDownload("seat-map-viewer.json");
+            console.log("afterwards canvasGroupObjects:");
+            console.log(canvasGroupObjects);
             
+            // removing all objects on the canvas
+            fabCanvas.clear();
+            
+            console.log("after clear fabCanvas:");
+            console.log(fabCanvas.getObjects());
+            // reapply groups
+            object_groups_array.forEach((groupArray=>{
+                    var group = new fabric.Group(groupArray, {
+                        lockScalingX: true,
+                        lockScalingY: true
+                    });
+                    fabCanvas.add(group);
+                }));
+            console.log("after re-add groups fabCanvas:");
+            console.log(fabCanvas.getObjects());
+            fabCanvas.renderAll();    
+                
 
-            var fileName = "seat-map.json";
-            var jsonString = JSON.stringify(seatMapJSONArray);
-
+        },
+        performDownload(name){
+            var fileName = name;
+            var jsonString = JSON.stringify(fabCanvas);
+            console.log("jsonString:");
+            console.log(jsonString);
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
             element.setAttribute('download', fileName);
@@ -251,7 +253,7 @@ Vue.component('add-general-form',{
             this.showAddGenForm = false;
         });
     }, 
-})
+});
 
 Vue.component('add-table-form',{
     template: '#add-table-form',
@@ -305,15 +307,6 @@ var vm = new Vue({
         createGroupPriceElement(userPrice, fabricObject){
             return {price: userPrice, fabricGroupObject: fabricObject};
         },
-        // GenerateSectionListItem(p) {
-        //     return { sectionID: "", price: p, rows: [], fabText: null, fabRect: null }
-        // },
-        // GenerateRowListItem(i) {
-        //     return { rowID: i, seats: [] }
-        // },
-        // GenerateSeatListItem(j, c, p) { //CNF: Price is in both seat and section to help editor and viewers.
-        //     return { seatID: j, fabCircle: c, isSold: false, price: p }
-        // },
         makeSeating: function (posX, posY, cols, rows, name, type, price) {
             var rad = 10,
                 dia = rad * 2,
