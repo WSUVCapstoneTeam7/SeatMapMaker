@@ -4,6 +4,8 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth( window.innerWidth );
 fabCanvas.setHeight( window.innerHeight);
 
+var editSeats = false;
+
 // resize canvas when window resizes
 $(window).resize(function() {
     fabCanvas.setWidth( window.innerWidth );
@@ -104,13 +106,30 @@ Vue.component('edit-form',{
     },
     methods:{
         submitEditSeating(){
-            console.log(fabCanvas.getActiveObject())
-            console.log(fabCanvas.getActiveObject().calcCoords())
+            //console.log(fabCanvas.getActiveObject())
+            //console.log(fabCanvas.getActiveObject().calcCoords())
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
                 vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType)
             }
+        },
+        seatEdit(){
+            console.log(fabCanvas.getActiveObject())
+            var selectedGroup = fabCanvas.getActiveObject();
+            groupItems = selectedGroup._objects;
+            selectedGroup._restoreObjectsState();
+            fabCanvas.remove(selectedGroup);
+            
+            for (var i = 0; i < groupItems.length; i++) {   
+                fabCanvas.add(groupItems[i]);
+                groupItems[i].dirty = true;
+                groupItems[i].lockMovementX = true;
+                groupItems[i].lockMovementY = true;
+                fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+            }
+            // if you have disabled render on addition
+            fabCanvas.renderAll();
         }
     },
     created(){
@@ -664,7 +683,7 @@ var vm = new Vue({
     created(){
         // listens for a signal saying to create a new seating section
         bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type)=>{
-            console.log(fabCanvas);
+            //console.log(fabCanvas);
             this.makeSeating(posX, posY, cols, rows, name, type);
 
         });
