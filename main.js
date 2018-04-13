@@ -44,7 +44,7 @@ Vue.component('add-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating', 100, 100, this.columns, this.rows, this.sectionName, this.sectionType, 100);
+            bus.$emit('sigMakeSeating', 100, 100, this.columns, this.rows, this.sectionName, this.sectionType);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
