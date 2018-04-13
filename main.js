@@ -118,33 +118,46 @@ Vue.component('drop-down-menu', {
             // this may be unnecessary if we were somehow able to associate a group property
             // to the objects as well as price. This is a brute force solution.
             this.performDownload("seat-map-maker.json");
+
             // get the group objects as an array
             const canvasGroupObjects = Array.from(fabCanvas.getObjects());
+
             // print canvasGroupObjects
             console.log("downloadstuff: canvasGroupObjects");
             console.log(canvasGroupObjects);
+
             // store the length because it was dynamically changing as items were added to fabCanvas
             console.log("canvasObjects length:"+canvasGroupObjects.length);
             const canvasObjectsLength = canvasGroupObjects.length;
+
+            // an array of arrays to hold the object arrays of each group
+            // this an array of the fabric object arrays
             var object_groups_array = [];
+
             // for each group in the fab canvas
             for (ii = 0; ii < canvasObjectsLength; ii++){
                 // store the fabric group 
                 var fabricGroup = canvasGroupObjects[ii];
+
                 // print fabric group type, needs to be group and nothing else
+                console.log("loadJson-fabricGroupType:");
                 console.log(fabricGroup.type);
-                // canvasObjects array was growing before and this was debug to prove 
-                // length grew in middle of for loop causing extra iterations.
-                console.log("iteration of canvas group"+ii);
+
                 // sets items within a group to their local position not group relative
                 fabricGroup._restoreObjectsState();
+
                 // get the individual objects from the group
                 var groupObjects = fabricGroup.getObjects();
+                
+                // push the array of objects from group onto the array of group objects
                 object_groups_array.push(groupObjects);
-                // remove the group from fab canvas
+
+                // remove the group from fabric canvas
                 fabCanvas.remove(fabricGroup);
-                // for each object in the fabric group
+
+                // for each of the groups objects
                 // add each of the objects individually into fabcanvas
+                // and mark them as dirty so they are refreshed
                 for(var jj = 0; jj < groupObjects.length; jj++){
                     groupObjects[jj].dirty = true;
                     fabCanvas.add(groupObjects[jj]);
@@ -175,6 +188,7 @@ Vue.component('drop-down-menu', {
 
         },
         performDownload(name){
+            console.log("download performing on "+ name);
             var fileName = name;
             var jsonString = JSON.stringify(fabCanvas);
             console.log("jsonString:");
@@ -317,14 +331,9 @@ Vue.component('add-table-form',{
 var vm = new Vue({
     el: '#vue-app',
     data: {
-        // associates a fabric group with the price for the section
-        group_price_array: [],
     },
     methods: {
-        createGroupPriceElement(userPrice, fabricObject){
-            return {price: userPrice, fabricGroupObject: fabricObject};
-        },
-        makeSeating: function (posX, posY, cols, rows, name, type, price) {
+        makeSeating (posX, posY, cols, rows, name, type, price) {
             var rad = 10,
                 dia = rad * 2,
                 gap = 5,
@@ -388,7 +397,6 @@ var vm = new Vue({
                     // add price property to circle
                     this.addPriceToObject(circle,price);
                     items.push(circle);
-                    // row_list_item.seats.push(this.GenerateSeatListItem(j, circle, price)); //CNF
                 }
             }
             var group = new fabric.Group(items, {
@@ -413,8 +421,7 @@ var vm = new Vue({
         deleteSeating () {
             // gets the currently active square
             var seatingToDelete = fabCanvas.getActiveObject();
-            console.log("This is Rect to Delete From Fabric: " + seatingToDelete);
-            vm.removePriceGroupElement(seatingToDelete);
+            // console.log("This is Rect to Delete From Fabric: " + seatingToDelete);
             fabCanvas.remove(seatingToDelete);
 
             fabCanvas.renderAll();
@@ -460,15 +467,13 @@ var vm = new Vue({
     
             items.push(container);
             items.push(text);
-    
+            this.addPriceToObject(container, price);
             var group = new fabric.Group(items, {
             lockScalingX: false,
             lockScalingY: false  
             });
             // this.seatArray.push(group);
-            // adds table group to group_price_array as a groupPriceElement
-            this.group_price_array.push(this.createGroupPriceElement(price, group));
-            this.printGroupPriceArray();
+            
             // add table group to fabric canvas for rendering
             fabCanvas.add(group);
             fabCanvas.renderAll();
@@ -481,8 +486,6 @@ var vm = new Vue({
                 groupItems = group._objects;
                 group._restoreObjectsState();
                 
-                // remove group from price group array 
-                vm.removePriceGroupElement(group);
 
                 fabCanvas.remove(group);
                 for (var i = 0; i < groupItems.length; i++) {
@@ -646,6 +649,8 @@ var vm = new Vue({
                             originX: 'center',
                             originY: 'center'
                         });
+                        this.addPriceToObject(circleL, price);
+                        this.addPriceToObject(circleR, price);
                         items.push(circleL);
                         items.push(circleR);
                     }
@@ -707,6 +712,7 @@ var vm = new Vue({
                         originX: 'center',
                         originY: 'center'
                     });
+                    this.addPriceToObject(circle, price);
                     items.push(circle);
                 }
             }
@@ -715,18 +721,9 @@ var vm = new Vue({
                 lockScalingX: true,
                 lockScalingY: true  
             });
-            // this.seatArray.push(group);
-            this.group_price_array.push(this.createGroupPriceElement(price, group));
-            console.log("Added Table to group_price array.");
-            this.printGroupPriceArray();
+            // // this.seatArray.push(group);
             fabCanvas.add(group);
             fabCanvas.renderAll();        
-        },
-        printGroupPriceArray(){
-            console.log("printGroupPriceArray - group_price_array:");
-            for(var ii = 0; ii < this.group_price_array.length; ii++){
-                console.log(this.group_price_array[ii]);
-            }
         },
         removePriceGroupElement(group){
             // console.log("removePriceGroupElement: Removing Group");
@@ -743,13 +740,30 @@ var vm = new Vue({
             }
         },
         addPriceToObject(object, price){
-            object.toObject = (function(toObject){
-                return function(){
-                    return fabric.util.object.extend(toObject.call(this),{
-                        price: price
-                    });
-                };
-            })(object.toObject);
+            console.log("addPriceToObject adding: "+price);
+            // object.stateProperties.push("price");
+            // console.log(object.stateProperties);
+            if ((price == undefined||(price<0))){
+                price = 999999;
+            }
+            console.log("addPriceToObject adding: "+price);
+            object.price = price;
+            
+        },
+        findPriceInData(dataFabObjects, fabObject){
+            var TAG = "findPriceInData-";
+            console.log(TAG);
+            console.log(dataFabObjects);
+            dataFabObjects.forEach((group)=>{
+                console.log(TAG+"group:");
+                console.log(group);
+                group.objects.forEach((object)=>{
+                    if(object == fabObject){
+                        console.log("object found");
+                    }
+                });
+                
+            });
         }
     },
     created() {
