@@ -59,14 +59,14 @@
             <div class="dropdown-menu">
                 <br>
                 <!-- each button tag has a v-on directive that leads to a different listener method -->
-                <button v-on:click='setAddSeating' class="dropdown-item">Add Seating</button>
+                <button v-on:click='setAddSeating' class="dropdown-item">Add Area</button>
                 <add-form></add-form>
-                <button v-on:click='setEditTool' class="dropdown-item">Edit Seating</button>
+                <button v-on:click='setEditTool' class="dropdown-item">Edit Area</button>
                 <edit-form></edit-form>
-                <a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>  
-                <add-general-form></add-general-form>
-                <a v-on:click='setAddTable' class="dropdown-item">Add Table</a>  
-                <add-table-form></add-table-form>            
+                <!--<a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>-->
+                <!--<add-general-form></add-general-form>-->
+                <!--<a v-on:click='setAddTable' class="dropdown-item">Add Table</a>-->
+                <!--<add-table-form></add-table-form>            -->
                 <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
                 <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
                 <br>
@@ -82,13 +82,39 @@
                 <!-- v-model directive binds data from field to data in Vue instance -->
                 Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
                 <!--<p>Seating Type</p><br>-->
-                Seating Type: <form>
-                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
-                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
-                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
+                Section Type: <form>
+                    <input type="radio" name="SectionType" value="Seating" v-model = "sectionType"> Seating
+                    <input type="radio" name="SectionType" value="Table" v-model = "sectionType"> Table
+                    <input type="radio" name="SectionType" value="General" v-model = "sectionType"> General
                 </form>
-                Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
-                Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
+                <template v-if="sectionType!='General'">
+                    Quality: <form>
+                        <input type="radio"  name="Type" value="VIP" v-model ="seatingType"> VIP
+                        <input type="radio" name="Type" value="Normal" v-model ="seatingType"> Normal
+                        <input type="radio" name="Type" value="Economy" v-model ="seatingType"> Economy
+                    </form>
+                </template>
+                <template v-else>
+                    Color: <input type="text" id="colorSelect" value="ffffff" v-model="color">
+                </template>
+                <!--<Section-Type></Section-Type>-->
+                <template v-if="sectionType=='Seating'">
+                    Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
+                    Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
+                </template>
+                <template v-if="sectionType=='Table'">
+                    Table Type: <form>
+                        <input type="radio"  name="Type" value="round" v-model ="tableType"> Round
+                        <input type="radio" name="Type" value="rect" v-model ="tableType"> Rectangle
+                    </form>
+                </template>
+                <template v-if="tableType=='round' && sectionType=='Table'">
+                    Seats: <input type="text" id="addRoundSeats" value="5" style="width:30" v-model="roundSeats" placeholder="#"></input>
+                </template>
+                <template v-if="tableType=='rect' && sectionType=='Table'">
+                    XSeats: <input type="text" id="addXSeats" value="5" style="width:30" v-model="xSeats" placeholder="#"></input>
+                    YSeats: <input type="text" id="addYSeats" value="5" style="width:30" v-model="ySeats" placeholder="#"></input>
+                </template>
                 <br>
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
@@ -105,9 +131,9 @@
                 Edit Seating <br>
                 Name: <input type="text" id="newName" v-model="name" placeholder="Section Name"></input><br>
                 Seating Type: <form>
-                    <input type="radio"  name="Type" value="VSeating" v-model ="sectionType"> VIP
-                    <input type="radio" name="Type" value="NSeating" v-model ="sectionType" checked> Seating
-                    <input type="radio" name="Type" value="Standing" v-model ="sectionType"> Standing
+                    <input type="radio"  name="Type" value="VSeating" v-model ="seatingType" :checked="seatingType=='VSeating'"> VIP
+                    <input type="radio" name="Type" value="NSeating" v-model ="seatingType" :checked="seatingType=='NSeating'"> Seating
+                    <input type="radio" name="Type" value="Standing" v-model ="seatingType" :checked="seatingType=='Standing'"> Standing
                 </form>
                 Columns: <input type="text" id="newCols" style="width:30" v-model="cols" placeholder="#"></input>
                 Rows: <input type="text" id="newRows" style="width:30" v-model="rows" placeholder="#"></input>

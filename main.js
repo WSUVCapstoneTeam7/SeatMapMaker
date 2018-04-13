@@ -77,12 +77,19 @@ var startY = 100
 
 Vue.component('add-form',{
     template: '#add-form',
+//    template: '#section-type',
     data(){
         return{
             sectionName: "default name",
-            sectionType: "NSeating",
+            seatingType: "Normal",
+            sectionType: "Seating",
+            tableType: "round",
+            roundSeats: 4,
+            xSeats: 2,
+            ySeats: 2,
             columns: 5,
             rows: 5,
+            color: "ffffff",
             showAddSeatForm: false,
         };
     },
@@ -91,11 +98,17 @@ Vue.component('add-form',{
         // and passes location 100,100 and the values collected from the input fields
         submitSeatingData(){
             //console.log("submit seat data");
-            //console.log(this.sectionType);
+            //console.log(this.seatingType);
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.sectionType);
+            console.log(this.sectionType)
+            if(this.sectionType=="Seating")
+                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType);
+            else if(this.sectionType=="Table")
+                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
+            else if(this.sectionType=="General")
+                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.sectionColor);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -121,6 +134,7 @@ Vue.component('edit-form',{
     data(){
         return {
             name: "",
+            seatingType: "",
             sectionType: "",
             rows: this.rows,
             cols: this.cols,
@@ -136,7 +150,7 @@ Vue.component('edit-form',{
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.sectionType)
+                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.seatingType)
             }
         }
     },
@@ -146,7 +160,7 @@ Vue.component('edit-form',{
             this.showEditSeatingForm = true;
             var group = fabCanvas.getActiveObject();
             this.name = group._objects[1].text;
-            this.sectionType = group._objects[0].type;
+            this.seatingType = group._objects[0].type;
             this.rows = group._objects[0].rows;
             this.cols = group._objects[0].cols;
             this.posX = group._objects[0].left;
@@ -357,11 +371,11 @@ var vm = new Vue({
             items.push(container);
             items.push(text);
             var color = "";
-            if (type == "VSeating")
+            if (type == "VIP")
                 color = "green";
-            else if (type == "NSeating")
+            else if (type == "Normal")
                 color = "yellow";
-            else if (type == "Standing")
+            else if (type == "Economy")
                 color = "red";
             for (var i=0; i < rows; i++) {
             for (var j=0; j < cols; j++) {
@@ -384,9 +398,16 @@ var vm = new Vue({
             lockScalingY: true	
             });
 
+//            var metaData = new fabric.Forms({
+//                name: this.name,
+//                seatingType: this.type,
+//                rows: this.rows,
+//                cols: this.cols
+//            })
 
             // this.seatArray.push(group);
             fabCanvas.add(group);
+//            fabCanvas.add(metaData);
             fabCanvas.renderAll();
 
             var ungroup = function (group) {
