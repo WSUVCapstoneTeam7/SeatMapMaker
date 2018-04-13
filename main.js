@@ -24,23 +24,50 @@ fabCanvas.on('mouse:wheel', function(opt) {
 })
 
 // canvas panning - adapted from http://jsfiddle.net/gncabrera/hkee5L6d/5/
-var panning = false;
-fabCanvas.on('mouse:up', function(e) {
-    panning = false;
+// pans with mouse click only
+// var panning = false;
+// fabCanvas.on('mouse:up', function(e) {
+//     panning = false;
+// });
+// fabCanvas.on('mouse:down', function(e) {
+//     if (e.target == null) {
+//         panning = true;
+//     }
+// });
+// fabCanvas.on('mouse:move', function (e) {
+//     if (panning && e && e.e) {
+//         //debugger;
+//         var units = 10;
+//         var delta = new fabric.Point(e.e.movementX, e.e.movementY);
+//         fabCanvas.relativePan(delta);
+//     }
+// });
+
+// pans with alt key
+fabCanvas.on('mouse:down', function(opt) {
+  var evt = opt.e;
+  if (evt.altKey === true) {
+    this.isDragging = true;
+    this.selection = false;
+    this.lastPosX = evt.clientX;
+    this.lastPosY = evt.clientY;
+  }
 });
-fabCanvas.on('mouse:down', function(e) {
-    if (e.target == null) {
-        panning = true;
-    }
+fabCanvas.on('mouse:move', function(opt) {
+  if (this.isDragging) {
+    var e = opt.e;
+    this.viewportTransform[4] += e.clientX - this.lastPosX;
+    this.viewportTransform[5] += e.clientY - this.lastPosY;
+    this.renderAll();
+    this.lastPosX = e.clientX;
+    this.lastPosY = e.clientY;
+  }
 });
-fabCanvas.on('mouse:move', function (e) {
-    if (panning && e && e.e) {
-        //debugger;
-        var units = 10;
-        var delta = new fabric.Point(e.e.movementX, e.e.movementY);
-        fabCanvas.relativePan(delta);
-    }
+fabCanvas.on('mouse:up', function(opt) {
+  this.isDragging = false;
+  this.selection = true;
 });
+
 
 var bus = new Vue();
 
@@ -52,10 +79,10 @@ Vue.component('add-form',{
     template: '#add-form',
     data(){
         return{
-            sectionName: "",
-            sectionType: "",
-            columns: null,
-            rows: null,
+            sectionName: "default name",
+            sectionType: "NSeating",
+            columns: 5,
+            rows: 5,
             showAddSeatForm: false,
         };
     },
@@ -104,8 +131,8 @@ Vue.component('edit-form',{
     },
     methods:{
         submitEditSeating(){
-            console.log(fabCanvas.getActiveObject())
-            console.log(fabCanvas.getActiveObject().calcCoords())
+            // console.log(fabCanvas.getActiveObject())
+            // console.log(fabCanvas.getActiveObject().calcCoords())
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
@@ -117,6 +144,13 @@ Vue.component('edit-form',{
         // a bus listener for toggling visibility of the the edit seating form.
         bus.$on('sigEditSeatFormOn', ()=>{
             this.showEditSeatingForm = true;
+            var group = fabCanvas.getActiveObject();
+            this.name = group._objects[1].text;
+            this.sectionType = group._objects[0].type;
+            this.rows = group._objects[0].rows;
+            this.cols = group._objects[0].cols;
+            this.posX = group._objects[0].left;
+            this.posY = group._objects[0].top;
         });
         bus.$on('sigEditSeatFormOff',()=>{
             this.showEditSeatingForm = false;
@@ -302,7 +336,11 @@ var vm = new Vue({
             width: sizeX,
             height: sizeY,
             });
-    
+/* EDIT STUFF */
+            container.set("rows", rows);
+            container.set("cols", cols);
+            container.set("type", type);
+/* EDIT STUFF */
             var text = new fabric.IText(name, {
             fontSize: 20,
             fontFamily: 'sans-serif',
@@ -327,7 +365,7 @@ var vm = new Vue({
                 color = "red";
             for (var i=0; i < rows; i++) {
             for (var j=0; j < cols; j++) {
-                console.log("adding circle");
+                //console.log("adding circle");
                 var circle = new fabric.Circle({
                 radius: rad,
                 left: posX, 
@@ -345,10 +383,45 @@ var vm = new Vue({
             lockScalingX: true,
             lockScalingY: true	
             });
+
+
             // this.seatArray.push(group);
             fabCanvas.add(group);
             fabCanvas.renderAll();
+
+            var ungroup = function (group) {
+                groupItems = group._objects;
+                group._restoreObjectsState();
+                fabCanvas.remove(group);
+                for (var i = 0; i < groupItems.length; i++) {
+                    fabCanvas.add(groupItems[i]);
+                    items[i].dirty = true;
+                    fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+                }
+                // if you have disabled render on addition
+                fabCanvas.renderAll();
+            };
         },
+
+        editSeating:function() {
+            console.log("in edit seating");
+            var group = fabCanvas.getActiveObject();
+            console.log(group._objects);
+            var groupItems = []
+            groupItems = group._objects;
+            group._restoreObjectsState();
+            fabCanvas.remove(group);
+            for (var i = 0; i < groupItems.length; i++) {
+                fabCanvas.add(groupItems[i]);
+                groupItems[i].dirty = true;
+                groupItems[i].hasControls = false;
+                fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+            }
+            // if you have disabled render on addition
+            fabCanvas.renderAll();
+
+        },
+
         // removes the currently selected Seat Selection from the fabCanvas.
         deleteSeating:function(){
             // gets the currently active square
@@ -664,11 +737,12 @@ var vm = new Vue({
     created(){
         // listens for a signal saying to create a new seating section
         bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type)=>{
-            console.log(fabCanvas);
+            //console.log(fabCanvas);
             this.makeSeating(posX, posY, cols, rows, name, type);
-
         });
-
+        bus.$on('sigEditSeating', ()=>{
+            this.editSeating();
+        });
         // listens for a signal saying to delete the seating
         bus.$on('sigDeleteSeating', ()=>{
             this.deleteSeating();
