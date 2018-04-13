@@ -4,9 +4,26 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth(window.innerWidth);
 fabCanvas.setHeight(window.innerHeight);
 
+// adds a price, section type, and sectionID properties to all fabric objects
+// if the object does not have the field defined then it will return undefined
+// thus only seats have price fields
+fabric.Object.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            price: this.price,
+            sectionType: this.sectionType,
+            sectionId: this.sectionId
+        });
+    };
+})(fabric.Object.prototype.toObject);
 
+// a vue bus instance that is used to communicate between 
+// vue applications and vue components using signals
+// that are defined inside the create methods of each party
+// signals are decided upon up front.
 var bus = new Vue();
 
+// vue component for the add seating form
 Vue.component('add-form',{
     template: '#add-form',
     data() {
