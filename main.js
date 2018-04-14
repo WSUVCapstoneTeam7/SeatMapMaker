@@ -12,7 +12,10 @@ fabric.Object.prototype.toObject = (function(toObject){
         return fabric.util.object.extend(toObject.call(this),{
             price: this.price,
             sectionType: this.sectionType,
-            groupId: this.groupId
+            groupId: this.groupId,
+            seatType: this.seatType,
+            rows: this.rows,
+            cols: this.cols,
         });
     };
 })(fabric.Object.prototype.toObject);
