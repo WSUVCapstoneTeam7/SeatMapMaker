@@ -4,21 +4,34 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth(window.innerWidth);
 fabCanvas.setHeight(window.innerHeight);
 
-// adds a price, section type, and sectionID properties to all fabric objects
-// if the object does not have the field defined then it will return undefined
-// thus only seats have price fields
-fabric.Object.prototype.toObject = (function(toObject){
+
+fabric.Circle.prototype.toObject = (function(toObject){
     return function(){
         return fabric.util.object.extend(toObject.call(this),{
             price: this.price,
-            sectionType: this.sectionType,
             groupId: this.groupId,
             seatType: this.seatType,
+        });
+    };
+})(fabric.Circle.prototype.toObject);
+
+fabric.Rect.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            price: this.price,
             rows: this.rows,
             cols: this.cols,
         });
     };
-})(fabric.Object.prototype.toObject);
+})(fabric.Rect.prototype.toObject);
+
+fabric.Group.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            sectionType: this.sectionType,
+        });
+    };
+})(fabric.Group.prototype.toObject);
 
 // a vue bus instance that is used to communicate between 
 // vue applications and vue components using signals
