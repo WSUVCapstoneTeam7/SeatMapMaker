@@ -4,7 +4,7 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth( window.innerWidth );
 fabCanvas.setHeight( window.innerHeight);
 
-var editSeats = false;
+var editGroup = null;
 
 // resize canvas when window resizes
 $(window).resize(function() {
@@ -115,21 +115,42 @@ Vue.component('edit-form',{
             }
         },
         seatEdit(){
-            console.log(fabCanvas.getActiveObject())
+            //console.log(fabCanvas.getActiveObject())
             var selectedGroup = fabCanvas.getActiveObject();
-            groupItems = selectedGroup._objects;
+            editGroup = selectedGroup._objects;
             selectedGroup._restoreObjectsState();
             fabCanvas.remove(selectedGroup);
             
-            for (var i = 0; i < groupItems.length; i++) {   
-                fabCanvas.add(groupItems[i]);
-                groupItems[i].dirty = true;
-                groupItems[i].lockMovementX = true;
-                groupItems[i].lockMovementY = true;
+            for (var i = 0; i < editGroup.length; i++) {   
+                fabCanvas.add(editGroup[i]);
+                editGroup[i].dirty = true;
+                editGroup[i].lockMovementX = true;
+                editGroup[i].lockMovementY = true;
                 fabCanvas.item(fabCanvas.size()-1).hasControls = false;
             }
             // if you have disabled render on addition
             fabCanvas.renderAll();
+        },
+        regroupEdit(){
+            console.log(editGroup);
+            if(editGroup!=null){
+                for(var i = 0; i < editGroup.length; i++){
+                    editGroup[i].lockMovementX = false;
+                    editGroup[i].lockMovementY = false;
+                    fabCanvas.remove(editGroup[i])
+                }
+                var group = new fabric.Group(editGroup, {
+                    lockScalingX: true,
+                    lockScalingY: true
+                });
+                fabCanvas.add(group)
+                fabCanvas.renderAll();
+                editGroup = null
+            }
+            for(var i = 0; i < fabCanvas._objects.length; i++){
+                console.log(i)
+                console.log(fabCanvas._objects[i])
+            }
         }
     },
     created(){
