@@ -5,6 +5,7 @@ fabCanvas.setWidth( window.innerWidth );
 fabCanvas.setHeight( window.innerHeight);
 
 var editGroup = null;
+var seatEditing = false;
 
 // resize canvas when window resizes
 $(window).resize(function() {
@@ -130,9 +131,10 @@ Vue.component('edit-form',{
             }
             // if you have disabled render on addition
             fabCanvas.renderAll();
+            seatEditing = true;
         },
         regroupEdit(){
-            console.log(editGroup);
+            //console.log(editGroup);
             if(editGroup!=null){
                 for(var i = 0; i < editGroup.length; i++){
                     editGroup[i].lockMovementX = false;
@@ -145,12 +147,24 @@ Vue.component('edit-form',{
                 });
                 fabCanvas.add(group)
                 fabCanvas.renderAll();
-                editGroup = null
+                editGroup = null;
+                seatEditing = false;
             }
-            for(var i = 0; i < fabCanvas._objects.length; i++){
-                console.log(i)
-                console.log(fabCanvas._objects[i])
+            // for(var i = 0; i < fabCanvas._objects.length; i++){
+            //     console.log(i)
+            //     console.log(fabCanvas._objects[i])
+            // }
+        },
+        removeSelectedSeat(){
+            if(seatEditing){
+                var seat = fabCanvas.getActiveObject()
+                //console.log(seat)
+                seat.fill = 'transparent';
+                seat.stroke = 'gray';
+                seat.dirty = true;
+                //console.log(seat)
             }
+            fabCanvas.renderAll();
         }
     },
     created(){
