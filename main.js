@@ -63,8 +63,8 @@ Vue.component('add-form',{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
         submitSeatingData() {
-            console.log("submit seat data");
-            console.log(this.sectionType);
+            // console.log("submit seat data");
+            // console.log(this.sectionType);
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
@@ -137,86 +137,12 @@ Vue.component('drop-down-menu', {
                 e.stopPropagation();
             });
         },
-        // downloadStuff() {
-        //     // download a version of the seat map with all the sections grouped.
-        //     // this may be unnecessary if we were somehow able to associate a group property
-        //     // to the objects as well as price. This is a brute force solution.
-        //     this.performDownload("seat-map.json");
-
-        //     // // get the group objects as an array
-        //     // const canvasGroupObjects = Array.from(fabCanvas.getObjects());
-
-        //     // // print canvasGroupObjects
-        //     // console.log("downloadstuff: canvasGroupObjects");
-        //     // console.log(canvasGroupObjects);
-
-        //     // // store the length because it was dynamically changing as items were added to fabCanvas
-        //     // console.log("canvasObjects length:"+canvasGroupObjects.length);
-        //     // const canvasObjectsLength = canvasGroupObjects.length;
-
-        //     // // an array of arrays to hold the object arrays of each group
-        //     // // this an array of the fabric object arrays
-        //     // var object_groups_array = [];
-
-        //     // // for each group in the fab canvas
-        //     // for (ii = 0; ii < canvasObjectsLength; ii++){
-        //     //     // store the fabric group 
-        //     //     var fabricGroup = canvasGroupObjects[ii];
-
-        //     //     // print fabric group type, needs to be group and nothing else
-        //     //     console.log("loadJson-fabricGroupType:");
-        //     //     console.log(fabricGroup.type);
-
-        //     //     // sets items within a group to their local position not group relative
-        //     //     fabricGroup._restoreObjectsState();
-
-        //     //     // get the individual objects from the group
-        //     //     var groupObjects = fabricGroup.getObjects();
-                
-        //     //     // push the array of objects from group onto the array of group objects
-        //     //     object_groups_array.push(groupObjects);
-
-        //     //     // remove the group from fabric canvas
-        //     //     fabCanvas.remove(fabricGroup);
-
-        //     //     // for each of the groups objects
-        //     //     // add each of the objects individually into fabcanvas
-        //     //     // and mark them as dirty so they are refreshed
-        //     //     for(var jj = 0; jj < groupObjects.length; jj++){
-        //     //         groupObjects[jj].dirty = true;
-        //     //         fabCanvas.add(groupObjects[jj]);
-        //     //     }
-        //     // }
-        //     // // download the seat map viewer map with each object seperated from groups
-        //     // this.performDownload("seat-map-viewer.json");
-        //     // console.log("afterwards canvasGroupObjects:");
-        //     // console.log(canvasGroupObjects);
-            
-        //     // // removing all objects on the canvas
-        //     // fabCanvas.clear();
-            
-        //     // console.log("after clear fabCanvas:");
-        //     // console.log(fabCanvas.getObjects());
-        //     // // reapply groups
-        //     // object_groups_array.forEach((groupArray=>{
-        //     //         var group = new fabric.Group(groupArray, {
-        //     //             lockScalingX: true,
-        //     //             lockScalingY: true
-        //     //         });
-        //     //         fabCanvas.add(group);
-        //     //     }));
-        //     // console.log("after re-add groups fabCanvas:");
-        //     // console.log(fabCanvas.getObjects());
-        //     // fabCanvas.renderAll();    
-                
-
-        // },
         performDownload(){
             // console.log("download performing on "+ name);
             var fileName = "seat-map.json";
             var jsonString = JSON.stringify(fabCanvas);
-            console.log("jsonString:");
-            console.log(jsonString);
+            // console.log("jsonString:");
+            // console.log(jsonString);
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
             element.setAttribute('download', fileName);
