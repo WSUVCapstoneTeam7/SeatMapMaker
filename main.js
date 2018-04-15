@@ -1,8 +1,8 @@
 /*jshint esversion: 6 */
 const fabCanvas = new fabric.Canvas('c');
 
-fabCanvas.setWidth( window.innerWidth );
-fabCanvas.setHeight( window.innerHeight);
+fabCanvas.setWidth(window.innerWidth);
+fabCanvas.setHeight(window.innerHeight);
 
 // resize canvas when window resizes
 $(window).resize(function() {
@@ -10,6 +10,14 @@ $(window).resize(function() {
     fabCanvas.setHeight( window.innerHeight);
     fabCanvas.calcOffset();
 });
+fabric.Rect.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            price: this.price,
+            groupId: this.groupId,
+        });
+    };
+})(fabric.Rect.prototype.toObject);
 
 // canvas zooming
 fabCanvas.on('mouse:wheel', function(opt) {
@@ -69,12 +77,45 @@ fabCanvas.on('mouse:up', function(opt) {
 });
 
 
+fabric.IText.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            groupId: this.groupId,
+        });
+    };
+})(fabric.IText.prototype.toObject);
+
+fabric.Circle.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            price: this.price,
+            groupId: this.groupId,
+            seatType: this.seatType,
+        });
+    };
+})(fabric.Circle.prototype.toObject);
+
+fabric.Group.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            sectionType: this.sectionType,
+            rows: this.rows,
+            cols: this.cols,
+        });
+    };
+})(fabric.Group.prototype.toObject);
+
+// a vue bus instance that is used to communicate between 
+// vue applications and vue components using signals
+// that are defined inside the create methods of each party
+// signals are decided upon up front.
 var bus = new Vue();
 
 // where to create new objects
 var startX = 200;
 var startY = 100
 
+// vue component for the add seating form
 Vue.component('add-form',{
     template: '#add-form',
 //    template: '#section-type',
@@ -93,12 +134,12 @@ Vue.component('add-form',{
             showAddSeatForm: false,
         };
     },
-    methods:{
+    methods: {
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
-        submitSeatingData(){
-            //console.log("submit seat data");
-            //console.log(this.seatingType);
+        submitSeatingData() {
+            // console.log("submit seat data");
+            // console.log(this.sectionType);
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
@@ -116,22 +157,22 @@ Vue.component('add-form',{
     },
     // function that launches when Forms component is created
     // signal listeners must be initialized on component creation
-    created(){
+    created() {
         // a "bus stop" signal listener for toggling the visibility of the add seating form.
-        bus.$on('sigAddSeatFormOn', ()=>{
+        bus.$on('sigAddSeatFormOn', () => {
             this.showAddSeatForm = true;
         });
         // a bus listener for toggling the visibility of both forms when 
         // the delete seating signal is received.
-        bus.$on('sigAddSeatFormOff',()=>{
+        bus.$on('sigAddSeatFormOff', () => {
             this.showAddSeatForm = false;
         });
-    }, 
+    },
 });
 
-Vue.component('edit-form',{
+Vue.component('edit-form', {
     template: '#edit-form',
-    data(){
+    data() {
         return {
             name: "",
             seatingType: "",
@@ -154,9 +195,9 @@ Vue.component('edit-form',{
             }
         }
     },
-    created(){
+    created() {
         // a bus listener for toggling visibility of the the edit seating form.
-        bus.$on('sigEditSeatFormOn', ()=>{
+        bus.$on('sigEditSeatFormOn', () => {
             this.showEditSeatingForm = true;
             var group = fabCanvas.getActiveObject();
             this.name = group._objects[1].text;
@@ -166,48 +207,50 @@ Vue.component('edit-form',{
             this.posX = group._objects[0].left;
             this.posY = group._objects[0].top;
         });
-        bus.$on('sigEditSeatFormOff',()=>{
+        bus.$on('sigEditSeatFormOff', () => {
             this.showEditSeatingForm = false;
         });
     }
 });
 
-Vue.component('drop-down-menu',{
+Vue.component('drop-down-menu', {
     template: '#drop-down-menu',
-    data(){
+    data() {
         return {};
     },
-    methods:{
-        preventDropmenuClosing(e){
-            $('.dropdown-menu').on('click', (e)=> {
+    methods: {
+        preventDropmenuClosing(e) {
+            $('.dropdown-menu').on('click', (e) => {
                 // console.log(e);
                 // console.log('stopped');
                 e.stopPropagation();
             });
         },
-        downloadStuff(){
+        performDownload(){
+            // console.log("download performing on "+ name);
             var fileName = "seat-map.json";
-            var jsonString = JSON.stringify(fabCanvas);    
-
+            var jsonString = JSON.stringify(fabCanvas);
+            // console.log("jsonString:");
+            // console.log(jsonString);
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
             element.setAttribute('download', fileName);
-        
+
             element.style.display = 'none';
             document.body.appendChild(element);
-        
+
             element.click();
-        
+
             document.body.removeChild(element);
         },
-        setAddSeating(){ 
+        setAddSeating() {
             // emits a bus signal to toggle the add seating form.
             bus.$emit('sigAddSeatFormOn');
             bus.$emit('sigEditSeatFormOff');
             bus.$emit('sigAddGenFormOff');
             bus.$emit('sigAddTableFormOff');
         },
-        setDeleteSeating(){
+        setDeleteSeating() {
             // emits a bus signal to toggle both forms off
             bus.$emit('sigAddSeatFormOff');
             bus.$emit('sigEditSeatFormOff');
@@ -216,7 +259,7 @@ Vue.component('drop-down-menu',{
             bus.$emit('sigAddGenFormOff');
             bus.$emit('sigAddTableFormOff');
         },
-        setEditTool(){
+        setEditTool() {
             // emits a bus signal to toggle the edit seating form
             bus.$emit('sigEditSeatFormOn');
             bus.$emit('sigAddSeatFormOff');
@@ -248,13 +291,13 @@ Vue.component('add-general-form',{
             sectionName: "test name",
             sectionColor: "ffffff",
             showAddGenForm: false,
-        }
+        };
     },
     methods:{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
         submitGeneralData(){
-            console.log("submit seat data");
+            // console.log("submit seat data");
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
@@ -278,7 +321,7 @@ Vue.component('add-general-form',{
             this.showAddGenForm = false;
         });
     }, 
-})
+});
 
 Vue.component('add-table-form',{
     template: '#add-table-form',
@@ -311,35 +354,36 @@ Vue.component('add-table-form',{
         // a "bus stop" signal listener for toggling the visibility of the add table form.
         bus.$on('sigAddTableFormOn', ()=>{
             this.showAddTableForm = true;
-        })
+        });
 
         // a bus listener for toggling the visibility of both forms when 
         // the delete table signal is received.
         bus.$on('sigAddTableFormOff',()=>{
             this.showAddTableForm = false;
-        })
+        });
     }, 
-})
+});
 
 var vm = new Vue({
-    el:'#vue-app',
-    data:{
-        mapData: {},
+    el: '#vue-app',
+    data: {
+        groupIdCounter: -1
     },
-    methods:{
-         //  makes the seating sections
-        makeSeating:function(posX, posY, cols, rows, name, type) {
+    methods: {
+        makeSeating (posX, posY, cols, rows, name, type, price) {
+            // increment the groupIdCounter
+            this.groupIdCounter+=1;
             var rad = 10,
-            dia = rad*2,
-            gap = 5,
-            sideBuff = 10,
-            topBuff = 10,
-            bottomBuff = 10,
-            sizeX = sideBuff*2 + cols*dia + (cols-1)*gap,
-            sizeY = topBuff + bottomBuff + rows*dia + (rows-1)*gap;
-    
+                dia = rad * 2,
+                gap = 5,
+                sideBuff = 10,
+                topBuff = 10,
+                bottomBuff = 10,
+                sizeX = sideBuff * 2 + cols * dia + (cols - 1) * gap,
+                sizeY = topBuff + bottomBuff + rows * dia + (rows - 1) * gap;
+
             var items = [];
-    
+
             var container = new fabric.Rect({
             left: posX,
             top: posY,
@@ -350,24 +394,24 @@ var vm = new Vue({
             width: sizeX,
             height: sizeY,
             });
-/* EDIT STUFF */
-            container.set("rows", rows);
-            container.set("cols", cols);
-            container.set("type", type);
-/* EDIT STUFF */
+            // set container groupId 
+            container.groupId = this.groupIdCounter;
+            
             var text = new fabric.IText(name, {
-            fontSize: 20,
-            fontFamily: 'sans-serif',
-            left: (posX+(sizeX/2)),
-            top: (posY+10),
-            originX: 'center', 
-            originY: 'top',
-            hasControls: false	
+                fontSize: 20,
+                fontFamily: 'sans-serif',
+                left: (posX + (sizeX / 2)),
+                top: (posY + 10),
+                originX: 'center',
+                originY: 'top',
+                hasControls: false
             });
-    
+            // set text groupId 
+            text.groupId = this.groupIdCounter;
+
             // resize container to accomodate text (maybe just make text box first?)
-            container.setHeight(topBuff*2 + text.height + bottomBuff + rows*dia + (rows-1)*gap);
-    
+            container.setHeight(topBuff * 2 + text.height + bottomBuff + rows * dia + (rows - 1) * gap);
+
             items.push(container);
             items.push(text);
             var color = "";
@@ -377,35 +421,40 @@ var vm = new Vue({
                 color = "yellow";
             else if (type == "Economy")
                 color = "red";
-            for (var i=0; i < rows; i++) {
-            for (var j=0; j < cols; j++) {
-                //console.log("adding circle");
-                var circle = new fabric.Circle({
-                radius: rad,
-                left: posX, 
-                top: posY,
-                left: (posX + sideBuff) + rad + j*dia + j*gap, 
-                top: (text.top + text.height + topBuff) + rad + i*dia + i*gap,
-                originX: 'center',
-                originY: 'center',
-                fill: color,
-                });
-                items.push(circle);
-            }
+            for (var i = 0; i < rows; i++) {
+                for (var j = 0; j < cols; j++) {
+                    // console.log("adding circle");
+                    var circle = new fabric.Circle({
+                        radius: rad,
+                        left: posX,
+                        top: posY,
+                        left: (posX + sideBuff) + rad + j * dia + j * gap,
+                        top: (text.top + text.height + topBuff) + rad + i * dia + i * gap,
+                        originX: 'center',
+                        originY: 'center',
+                        fill: color,
+                    });
+                    // set circle groupId
+                    circle.groupId = this.groupIdCounter;
+                    // set circle seatType
+                    circle.seatType = type;
+                    // add price property to circle
+                    this.addPriceToObject(circle,price);
+
+                    items.push(circle);
+                }
             }
             var group = new fabric.Group(items, {
-            lockScalingX: true,
-            lockScalingY: true	
+                lockScalingX: true,
+                lockScalingY: true
             });
+            // add row to group
+            group.rows = rows;
+            // add cols to group
+            group.cols = cols;
+            // adds a section type to seating
+            group.sectionType = "seating";
 
-//            var metaData = new fabric.Forms({
-//                name: this.name,
-//                seatingType: this.type,
-//                rows: this.rows,
-//                cols: this.cols
-//            })
-
-            // this.seatArray.push(group);
             fabCanvas.add(group);
 //            fabCanvas.add(metaData);
             fabCanvas.renderAll();
@@ -444,11 +493,12 @@ var vm = new Vue({
         },
 
         // removes the currently selected Seat Selection from the fabCanvas.
-        deleteSeating:function(){
+        deleteSeating () {
             // gets the currently active square
             var seatingToDelete = fabCanvas.getActiveObject();
-            console.log("This is Rect to Delete From Fabric: "+seatingToDelete);
+            // console.log("This is Rect to Delete From Fabric: " + seatingToDelete);
             fabCanvas.remove(seatingToDelete);
+
             fabCanvas.renderAll();
         },
         post:function(){
@@ -457,12 +507,15 @@ var vm = new Vue({
                 body: this.blog.content,
                 userId:1
             }).then(function(data){
-                console.log(data);
+                // console.log(data);
                 this.submitted = true;
             });
         },
 
-        makeGeneral:function(posX, posY, sizeX, sizeY, name, color) {
+        makeGeneral:function(posX, posY, sizeX, sizeY, name, color, price) {
+            // increment groupIdCounter
+            this.groupIdCounter +=1;
+
             var items = [];
     
             var container = new fabric.Rect({
@@ -476,6 +529,10 @@ var vm = new Vue({
             height: sizeY,
             objectCaching: false
             });
+            // set container groupId
+            container.groupId = this.groupIdCounter;
+            // set container price
+            this.addPriceToObject(container, price);
     
             var text = new fabric.IText(name, {
             fontSize: 20,
@@ -487,23 +544,31 @@ var vm = new Vue({
             hasControls: false,
             objectCashing: false 
             });
+            // set text groupId
+            text.groupId = this.groupIdCounter;
     
             items.push(container);
             items.push(text);
-    
+
             var group = new fabric.Group(items, {
             lockScalingX: false,
             lockScalingY: false  
             });
-            // this.seatArray.push(group);
+            // set section type
+            group.sectionType = "generalArea";
+            
+            // add table group to fabric canvas for rendering
             fabCanvas.add(group);
             fabCanvas.renderAll();
 
             // ungroup objects in group
-            var groupItems = []
+            var groupItems = [];
             var ungroup = function (group) {
+                // console.log("in ungroup()");
                 groupItems = group._objects;
                 group._restoreObjectsState();
+                
+
                 fabCanvas.remove(group);
                 for (var i = 0; i < groupItems.length; i++) {
                     fabCanvas.add(groupItems[i]);
@@ -515,23 +580,26 @@ var vm = new Vue({
             };
 
             group.on('modified', function(opt) {
-                ungroup(group)
+                ungroup(group);
                 // get info from current objects
-                var sizeX = container.getWidth()                
-                var sizeY = container.getHeight()
-                var posX = container.left
-                var posY = container.top
-                var color = container.fill.slice(1)
-                var name = text.get('text')
+                var sizeX = container.getWidth();
+                var sizeY = container.getHeight();
+                var posX = container.left;
+                var posY = container.top;
+                var color = container.fill.slice(1);
+                var name = text.get('text');
                 // remove current objects
                 fabCanvas.remove(container);
                 fabCanvas.remove(text);
                 // create new object
                 bus.$emit('sigMakeGeneral', posX, posY, sizeX, sizeY, name, color)
-            })
+            });
 
         },
-        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name) {
+        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, price) {
+            // increment groupIdCounter
+            this.groupIdCounter += 1;
+
             // make sure seat numbers are integers
             xSeats = parseInt(xSeats);
             ySeats = parseInt(ySeats);
@@ -570,6 +638,8 @@ var vm = new Vue({
                 e.target.set('stroke', 'transparent');
                 fabCanvas.renderAll();
             });
+            // set container groupId
+            container.groupId = this.groupIdCounter;
     
             var text = new fabric.IText(name, {
                 fontSize: 20,
@@ -579,7 +649,9 @@ var vm = new Vue({
                 originX: 'center', 
                 originY: 'top',
                 hasControls: false  
-            });  
+            });
+            // set text groupId
+            text.groupId = this.groupIdCounter;
 
             if (type == 'rect') {
 
@@ -621,6 +693,8 @@ var vm = new Vue({
                     originX: 'center',
                     originY: 'top'                    
                 });
+                // set table groupId
+                table.groupId = this.groupIdCounter;
 
                 // push initial objects
                 items.push(container);
@@ -649,6 +723,18 @@ var vm = new Vue({
                             originX: 'center',
                             originY: 'center'
                         });
+                        // set circleT groupId
+                        circleT.groupId = this.groupIdCounter;
+                        // set circleB groupId
+                        circleB.groupId = this.groupIdCounter;
+                        // set circleT price
+                        this.addPriceToObject(circleT, price);
+                        // set circleB price
+                        this.addPriceToObject(circleB, price);
+                        // set circleT seatType
+                        circleT.seatType = type;
+                        // set circleB seatType
+                        circleB.seatType = type;
                         items.push(circleT);
                         items.push(circleB);
                     }
@@ -676,6 +762,18 @@ var vm = new Vue({
                             originX: 'center',
                             originY: 'center'
                         });
+                        // set circleT groupId
+                        circleL.groupId = this.groupIdCounter;
+                        // set circleB groupId
+                        circleR.groupId = this.groupIdCounter;
+                        // set price of circleL
+                        this.addPriceToObject(circleL, price);
+                        // set price of circleR
+                        this.addPriceToObject(circleR, price);
+                        // set circleL seatType
+                        circleL.seatType = type;
+                        // set circleR seatType
+                        circleR.seatType = type;
                         items.push(circleL);
                         items.push(circleR);
                     }
@@ -715,6 +813,8 @@ var vm = new Vue({
                     originX: 'center',
                     originY: 'top'
                 });
+                // set table groupId
+                table.groupId = this.groupIdCounter;
 
                 // push initial objects
                 items.push(container);
@@ -737,6 +837,13 @@ var vm = new Vue({
                         originX: 'center',
                         originY: 'center'
                     });
+                    // set circle groupId
+                    circle.groupId = this.groupIdCounter;
+                    // set circle price
+                    this.addPriceToObject(circle, price);
+                    // set circle seatType
+                    circle.seatType = type;
+                    
                     items.push(circle);
                 }
             }
@@ -745,27 +852,36 @@ var vm = new Vue({
                 lockScalingX: true,
                 lockScalingY: true  
             });
-            // this.seatArray.push(group);
+            // set group sectionType
+            group.sectionType = "table";
+
             fabCanvas.add(group);
             fabCanvas.renderAll();
         },
-
-
+        addPriceToObject(object, price){
+            // console.log("addPriceToObject adding: "+price);
+            // object.stateProperties.push("price");
+            // console.log(object.stateProperties);
+            if ((price == undefined||(price<0))){
+                price = 999999;
+            }
+            // console.log("addPriceToObject adding: "+price);
+            object.price = price;
+            
+        },
     },
-
-
-
-    created(){
+    created() {
         // listens for a signal saying to create a new seating section
-        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type)=>{
-            //console.log(fabCanvas);
-            this.makeSeating(posX, posY, cols, rows, name, type);
+        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type, price) => {
+            // console.log(fabCanvas);
+            this.makeSeating(posX, posY, cols, rows, name, type, price);
+
         });
         bus.$on('sigEditSeating', ()=>{
             this.editSeating();
         });
         // listens for a signal saying to delete the seating
-        bus.$on('sigDeleteSeating', ()=>{
+        bus.$on('sigDeleteSeating', () => {
             this.deleteSeating();
         });
 
@@ -778,8 +894,45 @@ var vm = new Vue({
         });
 
         // loads a canvas instance from the data store in seat-map.json
-        $.getJSON( "./seat-map.json", function( data ) {
+        $.getJSON("./seat-map.json", function (data) {
+            // console.log("seat-map-maker data load:");
+            // console.log(data);
+            
+            // const dataFabObjects = data.objects;
+            // console.log(dataFabObjects);
+            // loads fabric data but not price
             fabCanvas.loadFromJSON(data);
-          });
+            // var fabGroupObjects = fabCanvas.getObjects();
+        //     fabGroupObjects.forEach((group)=>{
+        //         console.log("getJSon new group");
+        //         console.log("getJson group length");
+        //         console.log(group.getObjects().length);
+        //         var GeneralAreaException = {};
+        //         try{
+        //             group.getObjects().forEach((fabObject)=>{
+        //                 if(group.getObjects().length == 2){
+        //                     console.log("this is a general area");
+        //                     if(fabObject.type === "rect"){
+        //                         console.log("This is the General Area rect");
+        //                         // breaks out of forEach with exception throw
+        //                         GeneralAreaException = fabObject;
+        //                         throw GeneralAreaException;
+        //                     }
+        //                 }
+        //             console.log("getJson fabObject type:");
+        //             console.log(fabObject.type);
+        //             console.log("getJson fabObject fill:");
+        //             console.log(fabObject.fill);
+        //         });
+        //     }catch(e){
+        //         if (e !== GeneralAreaException){
+        //             throw e;
+        //         }
+        //         console.log("GeneralArea Exception");
+        //         var price = vm.findPriceInData(dataFabObjects, e);
+        //         // this.addPriceToObject(e, price);
+        //     }}
+        // );
+        });
     }
 });
