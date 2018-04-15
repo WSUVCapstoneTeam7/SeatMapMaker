@@ -515,6 +515,7 @@ var vm = new Vue({
         makeGeneral:function(posX, posY, sizeX, sizeY, name, color, price) {
             // increment groupIdCounter
             this.groupIdCounter +=1;
+            console.log("general increment groupCounter"+this.groupIdCounter);
 
             var items = [];
     
@@ -898,41 +899,25 @@ var vm = new Vue({
             // console.log("seat-map-maker data load:");
             // console.log(data);
             
-            // const dataFabObjects = data.objects;
-            // console.log(dataFabObjects);
-            // loads fabric data but not price
+            // loads data to fabric canvas
             fabCanvas.loadFromJSON(data);
-            // var fabGroupObjects = fabCanvas.getObjects();
-        //     fabGroupObjects.forEach((group)=>{
-        //         console.log("getJSon new group");
-        //         console.log("getJson group length");
-        //         console.log(group.getObjects().length);
-        //         var GeneralAreaException = {};
-        //         try{
-        //             group.getObjects().forEach((fabObject)=>{
-        //                 if(group.getObjects().length == 2){
-        //                     console.log("this is a general area");
-        //                     if(fabObject.type === "rect"){
-        //                         console.log("This is the General Area rect");
-        //                         // breaks out of forEach with exception throw
-        //                         GeneralAreaException = fabObject;
-        //                         throw GeneralAreaException;
-        //                     }
-        //                 }
-        //             console.log("getJson fabObject type:");
-        //             console.log(fabObject.type);
-        //             console.log("getJson fabObject fill:");
-        //             console.log(fabObject.fill);
-        //         });
-        //     }catch(e){
-        //         if (e !== GeneralAreaException){
-        //             throw e;
-        //         }
-        //         console.log("GeneralArea Exception");
-        //         var price = vm.findPriceInData(dataFabObjects, e);
-        //         // this.addPriceToObject(e, price);
-        //     }}
-        // );
+
+            // get the array of fabric objects stored in the canvas object
+            var fabGroupObjects = fabCanvas.getObjects();
+
+            // get the max groupID in the array of groups
+            fabGroupObjects.forEach(group => {
+                var fabObjects = group.getObjects();
+                // get first object 
+                var fabObject = fabObjects[0];
+                // check if this objects groupId is greater than the current groupId counter
+                if(vm.groupIdCounter < fabObject.groupId){
+                    // set groupIdCounter to the new max value
+                    vm.groupIdCounter = fabObject.groupId;
+                }
+            });
+            // out put initialized group Id counter value
+            console.log("getJSON-initialized groupId counter: "+vm.groupIdCounter);
         });
     }
 });
