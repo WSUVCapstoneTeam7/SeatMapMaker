@@ -4,6 +4,22 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth(window.innerWidth);
 fabCanvas.setHeight(window.innerHeight);
 
+fabric.Rect.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            price: this.price,
+            groupId: this.groupId,
+        });
+    };
+})(fabric.Rect.prototype.toObject);
+
+fabric.IText.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            groupId: this.groupId,
+        });
+    };
+})(fabric.IText.prototype.toObject);
 
 fabric.Circle.prototype.toObject = (function(toObject){
     return function(){
@@ -15,20 +31,12 @@ fabric.Circle.prototype.toObject = (function(toObject){
     };
 })(fabric.Circle.prototype.toObject);
 
-fabric.Rect.prototype.toObject = (function(toObject){
-    return function(){
-        return fabric.util.object.extend(toObject.call(this),{
-            price: this.price,
-            rows: this.rows,
-            cols: this.cols,
-        });
-    };
-})(fabric.Rect.prototype.toObject);
-
 fabric.Group.prototype.toObject = (function(toObject){
     return function(){
         return fabric.util.object.extend(toObject.call(this),{
             sectionType: this.sectionType,
+            rows: this.rows,
+            cols: this.cols,
         });
     };
 })(fabric.Group.prototype.toObject);
@@ -129,83 +137,83 @@ Vue.component('drop-down-menu', {
                 e.stopPropagation();
             });
         },
-        downloadStuff() {
-            // download a version of the seat map with all the sections grouped.
-            // this may be unnecessary if we were somehow able to associate a group property
-            // to the objects as well as price. This is a brute force solution.
-            this.performDownload("seat-map-maker.json");
+        // downloadStuff() {
+        //     // download a version of the seat map with all the sections grouped.
+        //     // this may be unnecessary if we were somehow able to associate a group property
+        //     // to the objects as well as price. This is a brute force solution.
+        //     this.performDownload("seat-map.json");
 
-            // get the group objects as an array
-            const canvasGroupObjects = Array.from(fabCanvas.getObjects());
+        //     // // get the group objects as an array
+        //     // const canvasGroupObjects = Array.from(fabCanvas.getObjects());
 
-            // print canvasGroupObjects
-            console.log("downloadstuff: canvasGroupObjects");
-            console.log(canvasGroupObjects);
+        //     // // print canvasGroupObjects
+        //     // console.log("downloadstuff: canvasGroupObjects");
+        //     // console.log(canvasGroupObjects);
 
-            // store the length because it was dynamically changing as items were added to fabCanvas
-            console.log("canvasObjects length:"+canvasGroupObjects.length);
-            const canvasObjectsLength = canvasGroupObjects.length;
+        //     // // store the length because it was dynamically changing as items were added to fabCanvas
+        //     // console.log("canvasObjects length:"+canvasGroupObjects.length);
+        //     // const canvasObjectsLength = canvasGroupObjects.length;
 
-            // an array of arrays to hold the object arrays of each group
-            // this an array of the fabric object arrays
-            var object_groups_array = [];
+        //     // // an array of arrays to hold the object arrays of each group
+        //     // // this an array of the fabric object arrays
+        //     // var object_groups_array = [];
 
-            // for each group in the fab canvas
-            for (ii = 0; ii < canvasObjectsLength; ii++){
-                // store the fabric group 
-                var fabricGroup = canvasGroupObjects[ii];
+        //     // // for each group in the fab canvas
+        //     // for (ii = 0; ii < canvasObjectsLength; ii++){
+        //     //     // store the fabric group 
+        //     //     var fabricGroup = canvasGroupObjects[ii];
 
-                // print fabric group type, needs to be group and nothing else
-                console.log("loadJson-fabricGroupType:");
-                console.log(fabricGroup.type);
+        //     //     // print fabric group type, needs to be group and nothing else
+        //     //     console.log("loadJson-fabricGroupType:");
+        //     //     console.log(fabricGroup.type);
 
-                // sets items within a group to their local position not group relative
-                fabricGroup._restoreObjectsState();
+        //     //     // sets items within a group to their local position not group relative
+        //     //     fabricGroup._restoreObjectsState();
 
-                // get the individual objects from the group
-                var groupObjects = fabricGroup.getObjects();
+        //     //     // get the individual objects from the group
+        //     //     var groupObjects = fabricGroup.getObjects();
                 
-                // push the array of objects from group onto the array of group objects
-                object_groups_array.push(groupObjects);
+        //     //     // push the array of objects from group onto the array of group objects
+        //     //     object_groups_array.push(groupObjects);
 
-                // remove the group from fabric canvas
-                fabCanvas.remove(fabricGroup);
+        //     //     // remove the group from fabric canvas
+        //     //     fabCanvas.remove(fabricGroup);
 
-                // for each of the groups objects
-                // add each of the objects individually into fabcanvas
-                // and mark them as dirty so they are refreshed
-                for(var jj = 0; jj < groupObjects.length; jj++){
-                    groupObjects[jj].dirty = true;
-                    fabCanvas.add(groupObjects[jj]);
-                }
-            }
-            // download the seat map viewer map with each object seperated from groups
-            this.performDownload("seat-map-viewer.json");
-            console.log("afterwards canvasGroupObjects:");
-            console.log(canvasGroupObjects);
+        //     //     // for each of the groups objects
+        //     //     // add each of the objects individually into fabcanvas
+        //     //     // and mark them as dirty so they are refreshed
+        //     //     for(var jj = 0; jj < groupObjects.length; jj++){
+        //     //         groupObjects[jj].dirty = true;
+        //     //         fabCanvas.add(groupObjects[jj]);
+        //     //     }
+        //     // }
+        //     // // download the seat map viewer map with each object seperated from groups
+        //     // this.performDownload("seat-map-viewer.json");
+        //     // console.log("afterwards canvasGroupObjects:");
+        //     // console.log(canvasGroupObjects);
             
-            // removing all objects on the canvas
-            fabCanvas.clear();
+        //     // // removing all objects on the canvas
+        //     // fabCanvas.clear();
             
-            console.log("after clear fabCanvas:");
-            console.log(fabCanvas.getObjects());
-            // reapply groups
-            object_groups_array.forEach((groupArray=>{
-                    var group = new fabric.Group(groupArray, {
-                        lockScalingX: true,
-                        lockScalingY: true
-                    });
-                    fabCanvas.add(group);
-                }));
-            console.log("after re-add groups fabCanvas:");
-            console.log(fabCanvas.getObjects());
-            fabCanvas.renderAll();    
+        //     // console.log("after clear fabCanvas:");
+        //     // console.log(fabCanvas.getObjects());
+        //     // // reapply groups
+        //     // object_groups_array.forEach((groupArray=>{
+        //     //         var group = new fabric.Group(groupArray, {
+        //     //             lockScalingX: true,
+        //     //             lockScalingY: true
+        //     //         });
+        //     //         fabCanvas.add(group);
+        //     //     }));
+        //     // console.log("after re-add groups fabCanvas:");
+        //     // console.log(fabCanvas.getObjects());
+        //     // fabCanvas.renderAll();    
                 
 
-        },
-        performDownload(name){
-            console.log("download performing on "+ name);
-            var fileName = name;
+        // },
+        performDownload(){
+            // console.log("download performing on "+ name);
+            var fileName = "seat-map.json";
             var jsonString = JSON.stringify(fabCanvas);
             console.log("jsonString:");
             console.log(jsonString);
@@ -347,9 +355,12 @@ Vue.component('add-table-form',{
 var vm = new Vue({
     el: '#vue-app',
     data: {
+        groupIdCounter: -1
     },
     methods: {
         makeSeating (posX, posY, cols, rows, name, type, price) {
+            // increment the groupIdCounter
+            this.groupIdCounter+=1;
             var rad = 10,
                 dia = rad * 2,
                 gap = 5,
@@ -371,7 +382,9 @@ var vm = new Vue({
                 width: sizeX,
                 height: sizeY,
             });
-
+            // set container groupId 
+            container.groupId = this.groupIdCounter;
+            
             var text = new fabric.IText(name, {
                 fontSize: 20,
                 fontFamily: 'sans-serif',
@@ -381,6 +394,8 @@ var vm = new Vue({
                 originY: 'top',
                 hasControls: false
             });
+            // set container groupId 
+            text.groupId = this.groupIdCounter;
 
             // resize container to accomodate text (maybe just make text box first?)
             container.setHeight(topBuff * 2 + text.height + bottomBuff + rows * dia + (rows - 1) * gap);
@@ -395,9 +410,6 @@ var vm = new Vue({
             else if (type == "Standing")
                 color = "red";
             for (var i = 0; i < rows; i++) {
-                // section_list_item.rows.push(this.GenerateRowListItem(i)); //CNF
-                // var row_list_length = section_list_item.rows.length;  //CNF
-                // var row_list_item = section_list_item.rows[row_list_length - 1];  //CNF
                 for (var j = 0; j < cols; j++) {
                     console.log("adding circle");
                     var circle = new fabric.Circle({
@@ -410,8 +422,13 @@ var vm = new Vue({
                         originY: 'center',
                         fill: color,
                     });
+                    // set circle groupId
+                    circle.groupId = this.groupIdCounter;
+                    // set circle seatType
+                    circle.seatType = type;
                     // add price property to circle
                     this.addPriceToObject(circle,price);
+
                     items.push(circle);
                 }
             }
@@ -419,8 +436,13 @@ var vm = new Vue({
                 lockScalingX: true,
                 lockScalingY: true
             });
-            // this.seatArray.push(group);
-            
+            // add row to group
+            group.rows = rows;
+            // add cols to group
+            group.cols = cols;
+            // adds a section type to seating
+            group.sectionType = "seating";
+
             fabCanvas.add(group);
             fabCanvas.renderAll();
             // SEE BELOW LINE: how to attach functions to act on objects given a certain event
@@ -455,6 +477,8 @@ var vm = new Vue({
 
 // NEW STUFF
         makeGeneral:function(posX, posY, sizeX, sizeY, name, color, price) {
+            // increment groupIdCounter
+            this.groupIdCounter +=1;
 
             var items = [];
     
@@ -469,6 +493,10 @@ var vm = new Vue({
             height: sizeY,
             objectCaching: false
             });
+            // set container groupId
+            container.groupId = this.groupIdCounter;
+            // set container price
+            this.addPriceToObject(container, price);
     
             var text = new fabric.IText(name, {
             fontSize: 20,
@@ -480,22 +508,25 @@ var vm = new Vue({
             hasControls: false,
             objectCashing: false 
             });
+            // set text groupId
+            text.groupId = this.groupIdCounter;
     
             items.push(container);
             items.push(text);
-            this.addPriceToObject(container, price);
+
             var group = new fabric.Group(items, {
             lockScalingX: false,
             lockScalingY: false  
             });
-            // this.seatArray.push(group);
+            // set section type
+            group.sectionType = "generalArea";
             
             // add table group to fabric canvas for rendering
             fabCanvas.add(group);
             fabCanvas.renderAll();
 
             // ungroup objects in group
-            var groupItems = []
+            var groupItems = [];
             var ungroup = function (group) {
                 
                 console.log("in ungroup()");
@@ -531,6 +562,9 @@ var vm = new Vue({
 
         },
         makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, price) {
+            // increment groupIdCounter
+            this.groupIdCounter += 1;
+
             // make sure seat numbers are integers
             xSeats = parseInt(xSeats);
             ySeats = parseInt(ySeats);
@@ -558,6 +592,8 @@ var vm = new Vue({
             width: sizeX,
             height: sizeY,
             });
+            // set container groupId
+            container.groupId = this.groupIdCounter;
     
             var text = new fabric.IText(name, {
                 fontSize: 20,
@@ -567,7 +603,9 @@ var vm = new Vue({
                 originX: 'center', 
                 originY: 'top',
                 hasControls: false  
-            });  
+            });
+            // set text groupId
+            text.groupId = this.groupIdCounter;
 
             if (type == 'rect') {
 /* Need something right here to check if total seats is 2 and make table smaller */
@@ -610,6 +648,8 @@ var vm = new Vue({
                     originX: 'center',
                     originY: 'top'                    
                 });
+                // set table groupId
+                table.groupId = this.groupIdCounter;
 
                 // push initial objects
                 items.push(container);
@@ -638,6 +678,18 @@ var vm = new Vue({
                             originX: 'center',
                             originY: 'center'
                         });
+                        // set circleT groupId
+                        circleT.groupId = this.groupIdCounter;
+                        // set circleB groupId
+                        circleB.groupId = this.groupIdCounter;
+                        // set circleT price
+                        this.addPriceToObject(circleT, price);
+                        // set circleB price
+                        this.addPriceToObject(circleB, price);
+                        // set circleT seatType
+                        circleT.seatType = type;
+                        // set circleB seatType
+                        circleB.seatType = type;
                         items.push(circleT);
                         items.push(circleB);
                     }
@@ -665,8 +717,18 @@ var vm = new Vue({
                             originX: 'center',
                             originY: 'center'
                         });
+                        // set circleT groupId
+                        circleL.groupId = this.groupIdCounter;
+                        // set circleB groupId
+                        circleR.groupId = this.groupIdCounter;
+                        // set price of circleL
                         this.addPriceToObject(circleL, price);
+                        // set price of circleR
                         this.addPriceToObject(circleR, price);
+                        // set circleL seatType
+                        circleL.seatType = type;
+                        // set circleR seatType
+                        circleR.seatType = type;
                         items.push(circleL);
                         items.push(circleR);
                     }
@@ -706,6 +768,8 @@ var vm = new Vue({
                     originX: 'center',
                     originY: 'top'
                 });
+                // set table groupId
+                table.groupId = this.groupIdCounter;
 
                 // push initial objects
                 items.push(container);
@@ -728,7 +792,13 @@ var vm = new Vue({
                         originX: 'center',
                         originY: 'center'
                     });
+                    // set circle groupId
+                    circle.groupId = this.groupIdCounter;
+                    // set circle price
                     this.addPriceToObject(circle, price);
+                    // set circle seatType
+                    circle.seatType = type;
+                    
                     items.push(circle);
                 }
             }
@@ -737,7 +807,9 @@ var vm = new Vue({
                 lockScalingX: true,
                 lockScalingY: true  
             });
-            // // this.seatArray.push(group);
+            // set group sectionType
+            group.sectionType = "table";
+
             fabCanvas.add(group);
             fabCanvas.renderAll();        
         },
@@ -804,7 +876,7 @@ var vm = new Vue({
         });
 // END OF NEW STUFF
         // loads a canvas instance from the data store in seat-map.json
-        $.getJSON("./seat-map-maker.json", function (data) {
+        $.getJSON("./seat-map.json", function (data) {
             console.log("seat-map-maker data load:");
             console.log(data);
             
