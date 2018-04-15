@@ -10,14 +10,6 @@ $(window).resize(function() {
     fabCanvas.setHeight( window.innerHeight);
     fabCanvas.calcOffset();
 });
-fabric.Rect.prototype.toObject = (function(toObject){
-    return function(){
-        return fabric.util.object.extend(toObject.call(this),{
-            price: this.price,
-            groupId: this.groupId,
-        });
-    };
-})(fabric.Rect.prototype.toObject);
 
 // canvas zooming
 fabCanvas.on('mouse:wheel', function(opt) {
@@ -76,7 +68,17 @@ fabCanvas.on('mouse:up', function(opt) {
   this.selection = true;
 });
 
+// adds custom properties to fabric Rect class
+fabric.Rect.prototype.toObject = (function(toObject){
+    return function(){
+        return fabric.util.object.extend(toObject.call(this),{
+            price: this.price,
+            groupId: this.groupId,
+        });
+    };
+})(fabric.Rect.prototype.toObject);
 
+// adds custom properties to fabric IText class
 fabric.IText.prototype.toObject = (function(toObject){
     return function(){
         return fabric.util.object.extend(toObject.call(this),{
@@ -85,6 +87,7 @@ fabric.IText.prototype.toObject = (function(toObject){
     };
 })(fabric.IText.prototype.toObject);
 
+// adds custom properties to fabric Circle class
 fabric.Circle.prototype.toObject = (function(toObject){
     return function(){
         return fabric.util.object.extend(toObject.call(this),{
@@ -95,6 +98,7 @@ fabric.Circle.prototype.toObject = (function(toObject){
     };
 })(fabric.Circle.prototype.toObject);
 
+// adds customm properties to fabric Group class
 fabric.Group.prototype.toObject = (function(toObject){
     return function(){
         return fabric.util.object.extend(toObject.call(this),{
