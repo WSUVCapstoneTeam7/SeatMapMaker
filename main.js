@@ -204,13 +204,13 @@ Vue.component('add-general-form',{
             sectionName: "test name",
             sectionColor: "ffffff",
             showAddGenForm: false,
-        }
+        };
     },
     methods:{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
         submitGeneralData(){
-            console.log("submit seat data");
+            // console.log("submit seat data");
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
@@ -267,15 +267,15 @@ Vue.component('add-table-form',{
         // a "bus stop" signal listener for toggling the visibility of the add table form.
         bus.$on('sigAddTableFormOn', ()=>{
             this.showAddTableForm = true;
-        })
+        });
 
         // a bus listener for toggling the visibility of both forms when 
         // the delete table signal is received.
         bus.$on('sigAddTableFormOff',()=>{
             this.showAddTableForm = false;
-        })
+        });
     }, 
-})
+});
 
 // NEW STUFF
 var vm = new Vue({
@@ -320,7 +320,7 @@ var vm = new Vue({
                 originY: 'top',
                 hasControls: false
             });
-            // set container groupId 
+            // set text groupId 
             text.groupId = this.groupIdCounter;
 
             // resize container to accomodate text (maybe just make text box first?)
@@ -337,7 +337,7 @@ var vm = new Vue({
                 color = "red";
             for (var i = 0; i < rows; i++) {
                 for (var j = 0; j < cols; j++) {
-                    console.log("adding circle");
+                    // console.log("adding circle");
                     var circle = new fabric.Circle({
                         radius: rad,
                         left: posX,
@@ -396,7 +396,7 @@ var vm = new Vue({
                 body: this.blog.content,
                 userId:1
             }).then(function(data){
-                console.log(data);
+                // console.log(data);
                 this.submitted = true;
             });
         },
@@ -455,7 +455,7 @@ var vm = new Vue({
             var groupItems = [];
             var ungroup = function (group) {
                 
-                console.log("in ungroup()");
+                // console.log("in ungroup()");
                 groupItems = group._objects;
                 group._restoreObjectsState();
                 
@@ -739,46 +739,17 @@ var vm = new Vue({
             fabCanvas.add(group);
             fabCanvas.renderAll();        
         },
-        removePriceGroupElement(group){
-            // console.log("removePriceGroupElement: Removing Group");
-            // console.log(group);
-            for(var ii = 0; ii < this.group_price_array.length; ii++){
-                // console.log("removePriceGroupElement: test element");
-                // console.log(this.group_price_array[ii]);
-                if (this.group_price_array[ii].fabricGroupObject == group){
-                    // console.log("Found Element to remove");
-                    this.group_price_array.splice(ii,1);
-                    // console.log("group_price_array element removed:");
-                    // console.log(this.group_price_array);
-                }
-            }
-        },
         addPriceToObject(object, price){
-            console.log("addPriceToObject adding: "+price);
+            // console.log("addPriceToObject adding: "+price);
             // object.stateProperties.push("price");
             // console.log(object.stateProperties);
             if ((price == undefined||(price<0))){
                 price = 999999;
             }
-            console.log("addPriceToObject adding: "+price);
+            // console.log("addPriceToObject adding: "+price);
             object.price = price;
             
         },
-        findPriceInData(dataFabObjects, fabObject){
-            var TAG = "findPriceInData-";
-            console.log(TAG);
-            console.log(dataFabObjects);
-            dataFabObjects.forEach((group)=>{
-                console.log(TAG+"group:");
-                console.log(group);
-                group.objects.forEach((object)=>{
-                    if(object == fabObject){
-                        console.log("object found");
-                    }
-                });
-                
-            });
-        }
     },
     created() {
         // listens for a signal saying to create a new seating section
@@ -803,14 +774,14 @@ var vm = new Vue({
 // END OF NEW STUFF
         // loads a canvas instance from the data store in seat-map.json
         $.getJSON("./seat-map.json", function (data) {
-            console.log("seat-map-maker data load:");
-            console.log(data);
+            // console.log("seat-map-maker data load:");
+            // console.log(data);
             
-            const dataFabObjects = data.objects;
-            console.log(dataFabObjects);
+            // const dataFabObjects = data.objects;
+            // console.log(dataFabObjects);
             // loads fabric data but not price
             fabCanvas.loadFromJSON(data);
-            var fabGroupObjects = fabCanvas.getObjects();
+            // var fabGroupObjects = fabCanvas.getObjects();
         //     fabGroupObjects.forEach((group)=>{
         //         console.log("getJSon new group");
         //         console.log("getJson group length");
