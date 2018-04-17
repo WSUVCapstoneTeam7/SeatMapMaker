@@ -46,7 +46,7 @@
                 <drop-down-menu></drop-down-menu>
             </div> 
             <div id="canvas">
-                <canvas id="c" width="1920" height="1080"></canvas>
+                <canvas id="c" width="1920" height="1080" data-toggle="popover"></canvas>
             </div>
         </div> 
     </body>
@@ -172,6 +172,12 @@
             <!-- <a v-for = "(blog,index) in blogs" v-bind:key ="index">{{blog.title}}</a> -->
         </div>
     </template>
+
+    <!--Pop-Up Menu-->
+    <a id="popover-content" class="list-group" style="display: none">
+        <a href="#" class="list-group-item"> Test</a>
+        Testing Popup
+    </a>
     <script src="main.js"></script>
 </html>
 
