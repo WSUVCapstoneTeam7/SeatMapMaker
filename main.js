@@ -97,8 +97,6 @@ Vue.component('add-form',{
         // triggered whenever a button is clicked. emits a sigMakeSeating signal 
         // and passes location 100,100 and the values collected from the input fields
         submitSeatingData(){
-            //console.log("submit seat data");
-            //console.log(this.seatingType);
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
@@ -133,9 +131,16 @@ Vue.component('edit-form',{
     template: '#edit-form',
     data(){
         return {
-            name: "",
+            sectionName: "",
             seatingType: "",
             sectionType: "",
+            tableType: "",
+            roundSeats: this.roundSeats,
+            xSeats: this.xSeats,
+            ySeats: this.ySeats,
+            columns: this.columns,
+            rows: this.rows,
+            sectionColor: "",
             rows: this.rows,
             cols: this.cols,
             posX: this.posX,
@@ -150,7 +155,12 @@ Vue.component('edit-form',{
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
-                vm.makeSeating(coords.tl.x, coords.tl.y, this.cols, this.rows, this.name, this.seatingType)
+                if(this.sectionType=="Seating")
+                    bus.$emit('sigMakeSeating', coords.tl.x, coords.tl.y,this.columns, this.rows, this.sectionName, this.seatingType);
+                else if(this.sectionType=="Table")
+                    bus.$emit('sigMakeTable', coords.tl.x, coords.tl.y,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
+                else if(this.sectionType=="General")
+                    bus.$emit('sigMakeGeneral', coords.tl.x, coords.tl.y,300,200, this.sectionName, this.sectionColor);
             }
         }
     },
@@ -159,12 +169,17 @@ Vue.component('edit-form',{
         bus.$on('sigEditSeatFormOn', ()=>{
             this.showEditSeatingForm = true;
             var group = fabCanvas.getActiveObject();
-            this.name = group._objects[1].text;
+            this.sectionName = group._objects[1].text;
             this.seatingType = group._objects[0].type;
+            this.sectionType = group._objects[0].sectionType;
             this.rows = group._objects[0].rows;
-            this.cols = group._objects[0].cols;
+            this.columns = group._objects[0].cols;
             this.posX = group._objects[0].left;
             this.posY = group._objects[0].top;
+            this.roundSeats = group._objects[0].seats;
+            this.xSeats = group._objects[0].xSeats;
+            this.ySeats = group._objects[0].ySeats;
+            this.tableType = group._objects[0].tableType;
         });
         bus.$on('sigEditSeatFormOff',()=>{
             this.showEditSeatingForm = false;
@@ -354,6 +369,7 @@ var vm = new Vue({
             container.set("rows", rows);
             container.set("cols", cols);
             container.set("type", type);
+            container.set("sectionType","Seating")
 /* EDIT STUFF */
             var text = new fabric.IText(name, {
             fontSize: 20,
@@ -398,16 +414,7 @@ var vm = new Vue({
             lockScalingY: true	
             });
 
-//            var metaData = new fabric.Forms({
-//                name: this.name,
-//                seatingType: this.type,
-//                rows: this.rows,
-//                cols: this.cols
-//            })
-
-            // this.seatArray.push(group);
             fabCanvas.add(group);
-//            fabCanvas.add(metaData);
             fabCanvas.renderAll();
 
             var ungroup = function (group) {
@@ -559,6 +566,13 @@ var vm = new Vue({
             width: sizeX,
             height: sizeY,
             });
+
+            container.set("seats", seats);
+            container.set("xSeats", xSeats);
+            container.set("ySeats", ySeats);
+//            container.set("type", seatType);
+            container.set("sectionType","Table")
+            container.set("tableType", type)
 
             container.on('mouse:over', function(e) {
                 e.target.set('stroke', 'black');

@@ -63,10 +63,6 @@
                 <add-form></add-form>
                 <button v-on:click='setEditTool' class="dropdown-item">Edit Area</button>
                 <edit-form></edit-form>
-                <!--<a v-on:click='setAddGeneral' class="dropdown-item">Add General Area</a>-->
-                <!--<add-general-form></add-general-form>-->
-                <!--<a v-on:click='setAddTable' class="dropdown-item">Add Table</a>-->
-                <!--<add-table-form></add-table-form>            -->
                 <button v-on:click="setDeleteSeating" class="dropdown-item">Delete Seating</button>
                 <button class="dropdown-item" v-on:click = 'downloadStuff'>Download</button>
                 <br>
@@ -125,70 +121,73 @@
     </template>
 
     <template id = "edit-form">
-        <!-- v-show directive makes div invisible if "showEditSeatingForm" is false -->
+        <!-- v-show directive makes div invisible if "showSeatingForm" is false -->
         <div v-show="showEditSeatingForm">
             <form>
-                Edit Seating <br>
-                Name: <input type="text" id="newName" v-model="name" placeholder="Section Name"></input><br>
-                Seating Type: <form>
-                    <input type="radio"  name="Type" value="VSeating" v-model ="seatingType" :checked="seatingType=='VSeating'"> VIP
-                    <input type="radio" name="Type" value="NSeating" v-model ="seatingType" :checked="seatingType=='NSeating'"> Seating
-                    <input type="radio" name="Type" value="Standing" v-model ="seatingType" :checked="seatingType=='Standing'"> Standing
-                </form>
-                Columns: <input type="text" id="newCols" style="width:30" v-model="cols" placeholder="#"></input>
-                Rows: <input type="text" id="newRows" style="width:30" v-model="rows" placeholder="#"></input>
-                <br>
-            </form> 
-            <button v-on:click ="submitEditSeating">Submit</button>
-        </div>
-    </template>
-    <template id = "add-general-form">
-        <!-- v-show directive makes div invisible if "showGeneralForm" is false -->
-        <div v-show="showAddGenForm">
-            <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
-                Color: <input id="addBG" value="ffffff" v-model = "sectionColor"></input><br>
+                Name: <input type="text" id="editName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
+                <!--<p>Seating Type</p><br>-->
+                Section Type: <form>
+                    <input type="radio" name="SectionType" value="Seating" v-model = "sectionType"> Seating
+                    <input type="radio" name="SectionType" value="Table" v-model = "sectionType"> Table
+                    <input type="radio" name="SectionType" value="General" v-model = "sectionType"> General
+                </form>
+                <template v-if="sectionType!='General'">
+                    Quality: <form>
+                        <input type="radio"  name="Type" value="VIP" v-model ="seatingType"> VIP
+                        <input type="radio" name="Type" value="Normal" v-model ="seatingType"> Normal
+                        <input type="radio" name="Type" value="Economy" v-model ="seatingType"> Economy
+                    </form>
+                </template>
+                <template v-else>
+                    Color: <input type="text" id="colorSelect" value="ffffff" v-model="sectionColor">
+                </template>
+                <!--<Section-Type></Section-Type>-->
+                <template v-if="sectionType=='Seating'">
+                    Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns" placeholder="#"></input>
+                    Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows" placeholder="#"></input>
+                </template>
+                <template v-if="sectionType=='Table'">
+                    Table Type: <form>
+                        <input type="radio"  name="Type" value="round" v-model ="tableType"> Round
+                        <input type="radio" name="Type" value="rect" v-model ="tableType"> Rectangle
+                    </form>
+                </template>
+                <template v-if="tableType=='round' && sectionType=='Table'">
+                    Seats: <input type="text" id="addRoundSeats" value="5" style="width:30" v-model="roundSeats" placeholder="#"></input>
+                </template>
+                <template v-if="tableType=='rect' && sectionType=='Table'">
+                    XSeats: <input type="text" id="addXSeats" value="5" style="width:30" v-model="xSeats" placeholder="#"></input>
+                    YSeats: <input type="text" id="addYSeats" value="5" style="width:30" v-model="ySeats" placeholder="#"></input>
+                </template>
                 <br>
             </form>
-            <!-- v-on calls "submitGeneralData" when a click event is detected on this button  -->
-            <button v-on:click ="submitGeneralData">Submit</button>
+            <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
+            <button v-on:click ="submitEditSeating">Submit</button>
             <!-- Debugging to see that the form toggle flag is being set -->
-        <p v-show="false"><span>{{showAddGenForm}}</span></p>
-        </div>        
+        <!--<p v-show="false"><span>{{showAddSeatForm}}</span></p>-->
+        </div>
     </template>
 
-    <template id = "add-table-form">
-        <!-- v-show directive makes div invisible if "showTableForm" is false -->
-        <div v-show="showAddTableForm">
-            <form>
-                <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
-                <input type="radio" id="tableType" value="round" v-model="tableType"> Round &nbsp &nbsp
-                <input type="radio" id="tableType" value="rect" v-model="tableType"> Rectangle<br>
-                <div v-show="tableType === 'round'">
-                    Seats: <input type="text" id="addSeats" value="8" style="width:30" v-model="seats"></input>
-                </div>
-                <div v-show="tableType === 'rect'">
-                    X-Seats: <input type="text" id="addXSeats" value="2" style="width:30" v-model="xSeats"></input>
-                    Y-Seats: <input type="text" id="addYSeats" value="2" style="width:30" v-model="ySeats"></input>
-                </div>
-                <br>
-            </form>
-            <!-- v-on calls "submitTableData" when a click event is detected on this button -->
-            <button v-on:click ="submitTableData">Submit</button>
-            <!-- Debugging to see that the form toggle flag is being set -->
-        <p v-show="false"><span>{{showAddTableForm}}</span></p>
-        </div>        
-    </template>
-    <template id = "get-data">
-        <div>
-            <button v-on:click = "Load Map">GetData</button>
-            <br>
-            <button v-on:click = "Save Map">postData</button>
-            <!-- <a v-for = "(blog,index) in blogs" v-bind:key ="index">{{blog.title}}</a> -->
-        </div>
-    </template>
+    <!--<template id = "edit-form">-->
+        <!--&lt;!&ndash; v-show directive makes div invisible if "showEditSeatingForm" is false &ndash;&gt;-->
+        <!--<div v-show="showEditSeatingForm">-->
+            <!--<form>-->
+                <!--Edit Seating <br>-->
+                <!--Name: <input type="text" id="newName" v-model="name" placeholder="Section Name"></input><br>-->
+                <!--Seating Type: <form>-->
+                    <!--<input type="radio"  name="Type" value="VSeating" v-model ="seatingType" :checked="seatingType=='VSeating'"> VIP-->
+                    <!--<input type="radio" name="Type" value="NSeating" v-model ="seatingType" :checked="seatingType=='NSeating'"> Seating-->
+                    <!--<input type="radio" name="Type" value="Standing" v-model ="seatingType" :checked="seatingType=='Standing'"> Standing-->
+                <!--</form>-->
+                <!--Columns: <input type="text" id="newCols" style="width:30" v-model="cols" placeholder="#"></input>-->
+                <!--Rows: <input type="text" id="newRows" style="width:30" v-model="rows" placeholder="#"></input>-->
+                <!--<br>-->
+            <!--</form>-->
+            <!--<button v-on:click ="submitEditSeating">Submit</button>-->
+        <!--</div>-->
+    <!--</template>-->
+
     <script src="main.js"></script>
 </html>
 
