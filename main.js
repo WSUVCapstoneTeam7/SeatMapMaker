@@ -66,6 +66,9 @@ fabCanvas.on('mouse:down', function(opt) {
     this.lastPosX = evt.clientX;
     this.lastPosY = evt.clientY;
   }
+  if(!fabCanvas.getActiveObject()){
+		$(".popup").remove();
+    }
 });
 fabCanvas.on('mouse:move', function(opt) {
   if (this.isDragging) {
@@ -76,11 +79,6 @@ fabCanvas.on('mouse:move', function(opt) {
     this.lastPosX = e.clientX;
     this.lastPosY = e.clientY;
   }
-fabCanvas.on('mouse:down', function(e) {
-    if(!fabCanvas.getActiveObject())
-    {
-		$(".popup").remove();
-    }
 });
 fabCanvas.on('mouse:up', function(opt) {
   this.isDragging = false;
@@ -631,22 +629,21 @@ var vm = new Vue({
         },
 
         editSeating:function() {
-            console.log("in edit seating");
-            var group = fabCanvas.getActiveObject();
-            console.log(group._objects);
-            var groupItems = []
-            groupItems = group._objects;
-            group._restoreObjectsState();
-            fabCanvas.remove(group);
-            for (var i = 0; i < groupItems.length; i++) {
-                fabCanvas.add(groupItems[i]);
-                groupItems[i].dirty = true;
-                groupItems[i].hasControls = false;
+            var selectedGroup = fabCanvas.getActiveObject();
+            editGroup = selectedGroup._objects;
+            selectedGroup._restoreObjectsState();
+            fabCanvas.remove(selectedGroup);
+            
+            for (var i = 0; i < editGroup.length; i++) {   
+                fabCanvas.add(editGroup[i]);
+                editGroup[i].dirty = true;
+                editGroup[i].lockMovementX = true;
+                editGroup[i].lockMovementY = true;
                 fabCanvas.item(fabCanvas.size()-1).hasControls = false;
             }
             // if you have disabled render on addition
             fabCanvas.renderAll();
-
+            seatEditing = true;
         },
 
         // removes the currently selected Seat Selection from the fabCanvas.
@@ -736,7 +733,6 @@ var vm = new Vue({
                 // if you have disabled render on addition
                 fabCanvas.renderAll();
             };
-
             group.on('modified', function(opt) {
                 ungroup(group);
                 // get info from current objects
@@ -1032,11 +1028,10 @@ var vm = new Vue({
             }
             // console.log("addPriceToObject adding: "+price);
             object.price = price;
+        },
         RemoveSeat() {
             this.removeSelectedSeat();
         }
-
-        },
     },
     created() {
         // listens for a signal saying to create a new seating section
