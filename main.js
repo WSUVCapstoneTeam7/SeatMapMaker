@@ -4,6 +4,9 @@ const fabCanvas = new fabric.Canvas('c');
 fabCanvas.setWidth(window.innerWidth);
 fabCanvas.setHeight(window.innerHeight);
 
+var editGroup = null;
+var seatEditing = false;
+
 // resize canvas when window resizes
 $(window).resize(function() {
     fabCanvas.setWidth( window.innerWidth );
@@ -23,6 +26,17 @@ fabCanvas.on('mouse:wheel', function(opt) {
     opt.e.stopPropagation();
 })
 
+function removeSeat() {
+    bus.$emit('sigRemoveSeat',[]);
+};
+
+function editSeating() {
+    bus.$emit('sigEditSeating',  []);
+};
+
+function regroupSeating() {
+    bus.$emit('sigRegroupSeating',  []);
+};
 // canvas panning - adapted from http://jsfiddle.net/gncabrera/hkee5L6d/5/
 // pans with mouse click only
 // var panning = false;
@@ -62,10 +76,32 @@ fabCanvas.on('mouse:move', function(opt) {
     this.lastPosX = e.clientX;
     this.lastPosY = e.clientY;
   }
+fabCanvas.on('mouse:down', function(e) {
+    if(!fabCanvas.getActiveObject())
+    {
+		$(".popup").remove();
+    }
 });
 fabCanvas.on('mouse:up', function(opt) {
   this.isDragging = false;
   this.selection = true;
+});
+fabCanvas.on('object:selected', function(e){
+    if(e.target.type=="circle") {
+        bus.$emit('sigAddSeatPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
+    } else {
+        bus.$emit('sigAddSectionPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
+    }
+});
+fabCanvas.on('object:modified',function(e){
+    if(e.target.type=="circle") {
+	    bus.$emit('sigAddSeatPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
+    } else {
+        bus.$emit('sigAddSectionPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
+    }
+});
+fabCanvas.on('object:moving',function(e){
+	$(".popup").remove();
 });
 
 // adds custom properties to fabric Rect class
@@ -196,9 +232,34 @@ Vue.component('edit-form', {
         };
     },
     methods:{
+        addSeatPopupMenu(x,y,w) {
+            $(".popup").remove();
+            var btnLeft = x;
+            var btnTop = y - 25;
+            var widthadjust=w/2;
+            var removeSeat = "removeSeat"
+            btnLeft = widthadjust+btnLeft-25;
+            var popup = "<ul id='popup' class='popup' style='position:absolute;top:"+btnTop+"px;left:"+btnLeft+"px;cursor:pointer;'>" +
+                            '<button class="btn" type="button" onclick="removeSeat();">Delete</button>' +
+                        "</ul>";
+            $(".canvas-container").append(popup);
+        },
+        addSectionPopupMenu(x,y,w) {
+            $(".popup").remove();
+            var btnLeft = x;
+            var btnTop = y - 25;
+            var widthadjust=w/2;
+            var removeSeat = "removeSeat"
+            btnLeft = widthadjust+btnLeft-25;
+            var popup = "<ul id='popup' class='popup' style='position:absolute;top:"+btnTop+"px;left:"+btnLeft+"px;cursor:pointer;'>" +
+                            '<button class="btn" type="button" onclick="editSeating();">Edit Seats</button><br>' +
+                            '<button class="btn" type="button" onclick="regroupSeating();">Stop Editing</button>' +
+                        "</ul>";
+            $(".canvas-container").append(popup);
+        },
         submitEditSeating(){
-            // console.log(fabCanvas.getActiveObject())
-            // console.log(fabCanvas.getActiveObject().calcCoords())
+            //console.log(fabCanvas.getActiveObject())
+            //console.log(fabCanvas.getActiveObject().calcCoords())
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
@@ -209,6 +270,58 @@ Vue.component('edit-form', {
                 else if(this.sectionType=="General")
                     bus.$emit('sigMakeGeneral', coords.tl.x, coords.tl.y,300,200, this.sectionName, this.sectionColor);
             }
+        },
+        seatEdit(){
+            //console.log(fabCanvas.getActiveObject())
+
+            var selectedGroup = fabCanvas.getActiveObject();
+            editGroup = selectedGroup._objects;
+            selectedGroup._restoreObjectsState();
+            fabCanvas.remove(selectedGroup);
+            
+            for (var i = 0; i < editGroup.length; i++) {   
+                fabCanvas.add(editGroup[i]);
+                editGroup[i].dirty = true;
+                editGroup[i].lockMovementX = true;
+                editGroup[i].lockMovementY = true;
+                fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+            }
+            // if you have disabled render on addition
+            fabCanvas.renderAll();
+            seatEditing = true;
+        },
+        regroupEdit(){
+            //console.log(editGroup);
+            if(editGroup!=null){
+                for(var i = 0; i < editGroup.length; i++){
+                    editGroup[i].lockMovementX = false;
+                    editGroup[i].lockMovementY = false;
+                    fabCanvas.remove(editGroup[i])
+                }
+                var group = new fabric.Group(editGroup, {
+                    lockScalingX: true,
+                    lockScalingY: true
+                });
+                fabCanvas.add(group)
+                fabCanvas.renderAll();
+                editGroup = null;
+                seatEditing = false;
+            }
+            // for(var i = 0; i < fabCanvas._objects.length; i++){
+            //     console.log(i)
+            //     console.log(fabCanvas._objects[i])
+            // }
+        },
+        removeSelectedSeat(){
+            if(seatEditing){
+                var seat = fabCanvas.getActiveObject()
+                //console.log(seat)
+                seat.fill = 'transparent';
+                seat.stroke = 'gray';
+                seat.dirty = true;
+                //console.log(seat)
+            }
+            fabCanvas.renderAll();
         }
     },
     created() {
@@ -230,6 +343,24 @@ Vue.component('edit-form', {
         });
         bus.$on('sigEditSeatFormOff', () => {
             this.showEditSeatingForm = false;
+        });
+        bus.$on('sigAddSeatPopup', (args)=>{
+            this.addSeatPopupMenu(args[0], args[1], args[2]);
+        });
+        bus.$on('sigAddSectionPopup', (args) => {
+            this.addSectionPopupMenu(args[0], args[1], args[2]);
+        });
+        bus.$on('sigRemoveSeat', () => {
+            $(".popup").remove();
+            this.removeSelectedSeat();
+        });
+        bus.$on('sigEditSeating', () => {
+            $(".popup").remove();
+            this.seatEdit();
+        });
+        bus.$on('sigRegroupSeating', () => {
+            $(".popup").remove();
+            this.regroupEdit();
         });
     }
 });
@@ -901,6 +1032,9 @@ var vm = new Vue({
             }
             // console.log("addPriceToObject adding: "+price);
             object.price = price;
+        RemoveSeat() {
+            this.removeSelectedSeat();
+        }
 
         },
     },
@@ -918,7 +1052,6 @@ var vm = new Vue({
         bus.$on('sigDeleteSeating', () => {
             this.deleteSeating();
         });
-
         // listens for a signal saying to create a new general section
         bus.$on('sigMakeGeneral', (posX, posY, sizeX, sizeY, name, color)=>{
             this.makeGeneral(posX, posY, sizeX, sizeY, name, color);
@@ -926,7 +1059,6 @@ var vm = new Vue({
         bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name)=>{
             this.makeTable(posX, posY, type, seats, xSeats, ySeats, name);
         });
-
         // loads a canvas instance from the data store in seat-map.json
         $.getJSON("./seat-map.json", function (data) {
             // console.log("seat-map-maker data load:");
