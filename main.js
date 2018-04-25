@@ -67,7 +67,7 @@ fabCanvas.on('mouse:down', function(opt) {
     this.lastPosY = evt.clientY;
   }
   if(!fabCanvas.getActiveObject()){
-		$(".popup").remove();
+        $(".popup").remove();
     }
 });
 fabCanvas.on('mouse:move', function(opt) {
@@ -93,13 +93,13 @@ fabCanvas.on('object:selected', function(e){
 });
 fabCanvas.on('object:modified',function(e){
     if(e.target.type=="circle") {
-	    bus.$emit('sigAddSeatPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
+        bus.$emit('sigAddSeatPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
     } else {
         bus.$emit('sigAddSectionPopup', [e.target.oCoords.mt.x, e.target.oCoords.mt.y, e.target.width]);
     }
 });
 fabCanvas.on('object:moving',function(e){
-	$(".popup").remove();
+    $(".popup").remove();
 });
 
 // adds custom properties to fabric Rect class
@@ -128,6 +128,8 @@ fabric.Circle.prototype.toObject = (function(toObject){
             price: this.price,
             groupId: this.groupId,
             seatType: this.seatType,
+            rowName: this.rowName,
+            colName: this.colName,
         });
     };
 })(fabric.Circle.prototype.toObject);
@@ -139,6 +141,8 @@ fabric.Group.prototype.toObject = (function(toObject){
             sectionType: this.sectionType,
             rows: this.rows,
             cols: this.cols,
+            rowStart: this.rowStart,
+            colStart: this.colStart,
         });
     };
 })(fabric.Group.prototype.toObject);
@@ -168,6 +172,8 @@ Vue.component('add-form',{
             ySeats: 2,
             columns: 5,
             rows: 5,
+            colStart: 1,
+            rowStart: "A",
             color: "ffffff",
             showAddSeatForm: false,
         };
@@ -183,7 +189,7 @@ Vue.component('add-form',{
             // the bus.$on (bus stop) and get routed to where it should be delivered.
             console.log(this.sectionType)
             if(this.sectionType=="Seating")
-                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType);
+                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart);
             else if(this.sectionType=="Table")
                 bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
             else if(this.sectionType=="General")
@@ -224,6 +230,8 @@ Vue.component('edit-form', {
             sectionColor: "",
             rows: this.rows,
             cols: this.cols,
+            colStart: 1,
+            rowStart: "A",
             posX: this.posX,
             posY: this.posY,
             showEditSeatingForm: false
@@ -262,7 +270,7 @@ Vue.component('edit-form', {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
                 if(this.sectionType=="Seating")
-                    bus.$emit('sigMakeSeating', coords.tl.x, coords.tl.y,this.columns, this.rows, this.sectionName, this.seatingType);
+                    bus.$emit('sigMakeSeating', coords.tl.x, coords.tl.y,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart);
                 else if(this.sectionType=="Table")
                     bus.$emit('sigMakeTable', coords.tl.x, coords.tl.y,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
                 else if(this.sectionType=="General")
@@ -332,6 +340,8 @@ Vue.component('edit-form', {
             this.sectionType = group._objects[0].sectionType;
             this.rows = group._objects[0].rows;
             this.columns = group._objects[0].cols;
+            this.rowStart = group._objects[0].rowStart;
+            this.colStart = group._objects[0].colStart;
             this.posX = group._objects[0].left;
             this.posY = group._objects[0].top;
             this.roundSeats = group._objects[0].seats;
@@ -520,7 +530,7 @@ var vm = new Vue({
         groupIdCounter: -1
     },
     methods: {
-        makeSeating (posX, posY, cols, rows, name, type, price) {
+        makeSeating (posX, posY, cols, rows, name, type, colStart, rowStart, price) {
             // increment the groupIdCounter
             this.groupIdCounter+=1;
             var rad = 10,
@@ -531,24 +541,28 @@ var vm = new Vue({
                 bottomBuff = 10,
                 sizeX = sideBuff * 2 + cols * dia + (cols - 1) * gap,
                 sizeY = topBuff + bottomBuff + rows * dia + (rows - 1) * gap;
+                currentCol = parseInt(colStart);
+                currentRow = rowStart;
 
             var items = [];
 
             var container = new fabric.Rect({
-            left: posX,
-            top: posY,
-            originX: 'left',
-            originY: 'top',
-            stroke: 'transparent',
-            fill: 'transparent',
-            width: sizeX,
-            height: sizeY,
+                left: posX,
+                top: posY,
+                originX: 'left',
+                originY: 'top',
+                stroke: 'transparent',
+                fill: 'transparent',
+                width: sizeX,
+                height: sizeY,
             });
 /* EDIT STUFF */
             container.set("rows", rows);
             container.set("cols", cols);
             container.set("type", type);
-            container.set("sectionType","Seating")
+            container.set("sectionType","Seating");
+            container.set("colStart", colStart);
+            container.set("rowStart", rowStart);
 /* EDIT STUFF */
             // set container groupId
             container.groupId = this.groupIdCounter;
@@ -596,9 +610,15 @@ var vm = new Vue({
                     circle.seatType = type;
                     // add price property to circle
                     this.addPriceToObject(circle,price);
+                    circle.rowName = currentRow;
+                    circle.colName = currentCol;
+                    //console.log("created seat " + currentRow + currentCol);
 
                     items.push(circle);
+                    currentCol = currentCol + 1;
                 }
+                currentCol = parseInt(colStart);;
+                currentRow = String.fromCharCode(currentRow.charCodeAt() + 1);
             }
             var group = new fabric.Group(items, {
                 lockScalingX: true,
@@ -1035,9 +1055,9 @@ var vm = new Vue({
     },
     created() {
         // listens for a signal saying to create a new seating section
-        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type, price) => {
+        bus.$on('sigMakeSeating', (posX, posY, cols, rows, name, type, colStart, rowStart, price) => {
             // console.log(fabCanvas);
-            this.makeSeating(posX, posY, cols, rows, name, type, price);
+            this.makeSeating(posX, posY, cols, rows, name, type, colStart, rowStart, price);
 
         });
         bus.$on('sigEditSeating', ()=>{
