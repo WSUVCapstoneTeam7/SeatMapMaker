@@ -155,7 +155,7 @@ var bus = new Vue();
 
 // where to create new objects
 var startX = 200;
-var startY = 100
+var startY = 100;
 
 // vue component for the add seating form
 Vue.component('add-form',{
@@ -193,7 +193,7 @@ Vue.component('add-form',{
             else if(this.sectionType=="Table")
                 bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
             else if(this.sectionType=="General")
-                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.sectionColor);
+                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.color);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -559,7 +559,7 @@ var vm = new Vue({
 /* EDIT STUFF */
             container.set("rows", rows);
             container.set("cols", cols);
-            container.set("type", type);
+            // container.set("type", type);
             container.set("sectionType","Seating");
             container.set("colStart", colStart);
             container.set("rowStart", rowStart);
@@ -690,7 +690,7 @@ var vm = new Vue({
             // increment groupIdCounter
             this.groupIdCounter +=1;
             console.log("general increment groupCounter"+this.groupIdCounter);
-
+            console.log("general color: "+color);
             var items = [];
     
             var container = new fabric.Rect({
@@ -806,8 +806,8 @@ var vm = new Vue({
             container.set("xSeats", xSeats);
             container.set("ySeats", ySeats);
 //            container.set("type", seatType);
-            container.set("sectionType","Table")
-            container.set("tableType", type)
+            container.set("sectionType","Table");
+            container.set("tableType", type);
 
             container.on('mouse:over', function(e) {
                 e.target.set('stroke', 'black');
