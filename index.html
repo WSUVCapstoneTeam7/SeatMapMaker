@@ -78,6 +78,7 @@
                 Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName"></input><br>
                 Columns: <input type="text" id="addCols" value="5" style="width:30" v-model="columns"></input>
                 Rows: <input type="text" id="addRows" value="7" style="width:30" v-model="rows"></input>
+                Price: <input type="number" id="addPrice" value="100" style="width:100" v-model="price"></input>
                 <br>
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
@@ -95,6 +96,7 @@
                 Name: <input type="text" id="newName"></input><br>
                 Columns: <input type="text" id="newCols" style="width:30"></input>
                 Rows: <input type="text" id="newRows" style="width:30"></input>
+                Price: <input type="number" id="newPrice" style="width: 100"></input>
                 <br>
             </form> 
             <!-- <button v-on:click ="submitEditSeating">Submit changes</button> -->
