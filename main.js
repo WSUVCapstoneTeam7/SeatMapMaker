@@ -108,6 +108,7 @@ fabric.Rect.prototype.toObject = (function(toObject){
         return fabric.util.object.extend(toObject.call(this),{
             price: this.price,
             groupId: this.groupId,
+            seatType: this.seatType
         });
     };
 })(fabric.Rect.prototype.toObject);
@@ -127,7 +128,6 @@ fabric.Circle.prototype.toObject = (function(toObject){
         return fabric.util.object.extend(toObject.call(this),{
             price: this.price,
             groupId: this.groupId,
-            seatType: this.seatType,
             rowName: this.rowName,
             colName: this.colName,
         });
@@ -191,7 +191,7 @@ Vue.component('add-form',{
             if(this.sectionType=="Seating")
                 bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart);
             else if(this.sectionType=="Table")
-                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
+                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatingType);
             else if(this.sectionType=="General")
                 bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.color);
 
@@ -222,13 +222,13 @@ Vue.component('edit-form', {
             seatingType: "",
             sectionType: "",
             tableType: "",
+            seatType: "",
             roundSeats: this.roundSeats,
             xSeats: this.xSeats,
             ySeats: this.ySeats,
             columns: this.columns,
             rows: this.rows,
             sectionColor: "",
-            rows: this.rows,
             cols: this.cols,
             colStart: 1,
             rowStart: "A",
@@ -272,7 +272,7 @@ Vue.component('edit-form', {
                 if(this.sectionType=="Seating")
                     bus.$emit('sigMakeSeating', coords.tl.x, coords.tl.y,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart);
                 else if(this.sectionType=="Table")
-                    bus.$emit('sigMakeTable', coords.tl.x, coords.tl.y,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName);
+                    bus.$emit('sigMakeTable', coords.tl.x, coords.tl.y,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatType);
                 else if(this.sectionType=="General")
                     bus.$emit('sigMakeGeneral', coords.tl.x, coords.tl.y,300,200, this.sectionName, this.sectionColor);
             }
@@ -493,6 +493,7 @@ Vue.component('add-table-form',{
             xSeats: 5,
             ySeats: 2,
             showAddTableForm: false,
+            seatType: ""
         };
     },
     methods:{
@@ -502,7 +503,7 @@ Vue.component('add-table-form',{
             // emit a Make Table bus signal; or place a passenger on the bus carrying the 
             // parameters to make a table. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeTable',startX,startY,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName);
+            bus.$emit('sigMakeTable',startX,startY,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName, this.seatType);
 
             // set toggle the table forms visibility since the table has been created.
             this.showAddTableForm = false;
@@ -559,7 +560,7 @@ var vm = new Vue({
 /* EDIT STUFF */
             container.set("rows", rows);
             container.set("cols", cols);
-            // container.set("type", type);
+            container.set("seatType", type);
             container.set("sectionType","Seating");
             container.set("colStart", colStart);
             container.set("rowStart", rowStart);
@@ -607,7 +608,7 @@ var vm = new Vue({
                     // set circle groupId
                     circle.groupId = this.groupIdCounter;
                     // set circle seatType
-                    circle.seatType = type;
+                    // circle.seatType = type;
                     // add price property to circle
                     this.addPriceToObject(circle,price);
                     circle.rowName = currentRow;
@@ -770,7 +771,7 @@ var vm = new Vue({
             });
 
         },
-        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, price) {
+        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, price, seatType) {
             // increment groupIdCounter
             this.groupIdCounter += 1;
 
@@ -805,7 +806,7 @@ var vm = new Vue({
             container.set("seats", seats);
             container.set("xSeats", xSeats);
             container.set("ySeats", ySeats);
-//            container.set("type", seatType);
+            container.set("seatType", seatType);
             container.set("sectionType","Table");
             container.set("tableType", type);
 
@@ -913,9 +914,9 @@ var vm = new Vue({
                         // set circleB price
                         this.addPriceToObject(circleB, price);
                         // set circleT seatType
-                        circleT.seatType = type;
+                        // circleT.seatType = type;
                         // set circleB seatType
-                        circleB.seatType = type;
+                        // circleB.seatType = type;
                         items.push(circleT);
                         items.push(circleB);
                     }
@@ -952,9 +953,9 @@ var vm = new Vue({
                         // set price of circleR
                         this.addPriceToObject(circleR, price);
                         // set circleL seatType
-                        circleL.seatType = type;
+                        // circleL.seatType = type;
                         // set circleR seatType
-                        circleR.seatType = type;
+                        // circleR.seatType = type;
                         items.push(circleL);
                         items.push(circleR);
                     }
@@ -1023,7 +1024,7 @@ var vm = new Vue({
                     // set circle price
                     this.addPriceToObject(circle, price);
                     // set circle seatType
-                    circle.seatType = type;
+                    // circle.seatType = type;
 
                     items.push(circle);
                 }
