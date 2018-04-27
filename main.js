@@ -176,6 +176,7 @@ Vue.component('add-form',{
             rowStart: "A",
             color: "ffffff",
             showAddSeatForm: false,
+            price: -1
         };
     },
     methods: {
