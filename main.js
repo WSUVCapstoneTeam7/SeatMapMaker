@@ -176,6 +176,7 @@ Vue.component('add-form',{
             rowStart: "A",
             color: "ffffff",
             showAddSeatForm: false,
+            price: 0
         };
     },
     methods: {
@@ -189,11 +190,11 @@ Vue.component('add-form',{
             // the bus.$on (bus stop) and get routed to where it should be delivered.
             console.log(this.sectionType)
             if(this.sectionType=="Seating")
-                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart);
+                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart, parseInt(this.price));
             else if(this.sectionType=="Table")
-                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatingType);
+                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatingType, parseInt(this.price));
             else if(this.sectionType=="General")
-                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.color);
+                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.color, parseInt(this.price));
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
@@ -234,7 +235,8 @@ Vue.component('edit-form', {
             rowStart: "A",
             posX: this.posX,
             posY: this.posY,
-            showEditSeatingForm: false
+            showEditSeatingForm: false,
+            price: 0
         };
     },
     methods:{
@@ -270,11 +272,11 @@ Vue.component('edit-form', {
                 var coords = fabCanvas.getActiveObject().calcCoords()
                 vm.deleteSeating()
                 if(this.sectionType=="Seating")
-                    bus.$emit('sigMakeSeating', coords.tl.x, coords.tl.y,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart);
+                    bus.$emit('sigMakeSeating', coords.tl.x, coords.tl.y,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart, this.price``);
                 else if(this.sectionType=="Table")
-                    bus.$emit('sigMakeTable', coords.tl.x, coords.tl.y,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatType);
+                    bus.$emit('sigMakeTable', coords.tl.x, coords.tl.y,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatType, this.price);
                 else if(this.sectionType=="General")
-                    bus.$emit('sigMakeGeneral', coords.tl.x, coords.tl.y,300,200, this.sectionName, this.sectionColor);
+                    bus.$emit('sigMakeGeneral', coords.tl.x, coords.tl.y,300,200, this.sectionName, this.sectionColor, this.price);
             }
         },
         seatEdit(){
@@ -461,7 +463,7 @@ Vue.component('add-general-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the 
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.sectionColor);
+            bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.sectionColor, this.price);
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddGenForm = false;
@@ -493,7 +495,8 @@ Vue.component('add-table-form',{
             xSeats: 5,
             ySeats: 2,
             showAddTableForm: false,
-            seatType: ""
+            seatType: "",
+            price: 0
         };
     },
     methods:{
@@ -503,7 +506,8 @@ Vue.component('add-table-form',{
             // emit a Make Table bus signal; or place a passenger on the bus carrying the 
             // parameters to make a table. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            bus.$emit('sigMakeTable',startX,startY,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName, this.seatType);
+            console.log("Adding seating");
+            bus.$emit('sigMakeTable',startX,startY,this.tableType, this.seats, this.xSeats, this.ySeats, this.sectionName, this.seatType, this.price);
 
             // set toggle the table forms visibility since the table has been created.
             this.showAddTableForm = false;
@@ -761,18 +765,21 @@ var vm = new Vue({
                 var sizeY = container.getHeight();
                 var posX = container.left;
                 var posY = container.top;
+                var price = container.price;
                 var color = container.fill.slice(1);
                 var name = text.get('text');
                 // remove current objects
                 fabCanvas.remove(container);
                 fabCanvas.remove(text);
                 // create new object
-                bus.$emit('sigMakeGeneral', posX, posY, sizeX, sizeY, name, color)
+                bus.$emit('sigMakeGeneral', posX, posY, sizeX, sizeY, name, color, price)
             });
 
         },
-        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, price, seatType) {
+        makeTable:function(posX, posY, type, seats, xSeats, ySeats, name, seatType, price) {
             // increment groupIdCounter
+            console.log("makeTable");
+            console.log(price);
             this.groupIdCounter += 1;
 
             // make sure seat numbers are integers
@@ -1069,11 +1076,15 @@ var vm = new Vue({
             this.deleteSeating();
         });
         // listens for a signal saying to create a new general section
-        bus.$on('sigMakeGeneral', (posX, posY, sizeX, sizeY, name, color)=>{
-            this.makeGeneral(posX, posY, sizeX, sizeY, name, color);
+        bus.$on('sigMakeGeneral', (posX, posY, sizeX, sizeY, name, color, price)=>{
+            this.makeGeneral(posX, posY, sizeX, sizeY, name, color, price);
         });
-        bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name)=>{
-            this.makeTable(posX, posY, type, seats, xSeats, ySeats, name);
+        bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name, seatingType, price)=>{
+            console.log("On Sig Make Table:");
+            console.log("name"+ name);
+            console.log("price"+price);
+
+            this.makeTable(posX, posY, type, seats, xSeats, ySeats, name, seatingType, price);
         });
         // loads a canvas instance from the data store in seat-map.json
         $.getJSON("./seat-map.json", function (data) {

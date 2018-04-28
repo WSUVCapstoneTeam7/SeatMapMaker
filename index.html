@@ -76,8 +76,9 @@
         <div v-show="showAddSeatForm">
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
+                Name: <input type="text" id="addName" value="Test Name" v-model ="sectionName" placeholder="Section Name"><br>
                 <!--<p>Seating Type</p><br>-->
+                Price: <input type="number" id="addPrice" value="100" style="width:100" v-model="price"><br>
                 Section Type: <form>
                     <input type="radio" name="SectionType" value="Seating" v-model = "sectionType"> Seating
                     <input type="radio" name="SectionType" value="Table" v-model = "sectionType"> Table
@@ -125,6 +126,7 @@
                     XSeats: <input type="text" id="addXSeats" value="5" style="width:30" v-model="xSeats" placeholder="#"></input>
                     YSeats: <input type="text" id="addYSeats" value="5" style="width:30" v-model="ySeats" placeholder="#"></input>
                 </template>
+                
                 <br>
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
@@ -139,7 +141,8 @@
         <div v-show="showEditSeatingForm">
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
-                Name: <input type="text" id="editName" value="Test Name" v-model ="sectionName" placeholder="Section Name"></input><br>
+                Name: <input type="text" id="editName" value="Test Name" v-model ="sectionName" placeholder="Section Name"><br>
+                Price: <input type="number" id="newPrice" style="width: 100"><br>
                 <!--<p>Seating Type</p><br>-->
                 Section Type: <form>
                     <input type="radio" name="SectionType" value="Seating" v-model = "sectionType"> Seating
@@ -188,7 +191,7 @@
                     XSeats: <input type="text" id="addXSeats" value="5" style="width:30" v-model="xSeats" placeholder="#"></input>
                     YSeats: <input type="text" id="addYSeats" value="5" style="width:30" v-model="ySeats" placeholder="#"></input>
                 </template>
-                <br>
+                
             </form>
             <!-- v-on calls "submitSeatingData" when a click event is detected on this button  -->
             <button v-on:click ="submitEditSeating">Submit</button>
