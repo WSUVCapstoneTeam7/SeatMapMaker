@@ -190,11 +190,11 @@ Vue.component('add-form',{
             // the bus.$on (bus stop) and get routed to where it should be delivered.
             console.log(this.sectionType)
             if(this.sectionType=="Seating")
-                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart, this.price);
+                bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart, parseInt(this.price));
             else if(this.sectionType=="Table")
-                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatingType, this.price);
+                bus.$emit('sigMakeTable',startX,startY,this.tableType, this.roundSeats, this.xSeats, this.ySeats, this.sectionName, this.seatingType, parseInt(this.price));
             else if(this.sectionType=="General")
-                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.color, this.price);
+                bus.$emit('sigMakeGeneral',startX,startY,300,200, this.sectionName, this.color, parseInt(this.price));
 
             // set toggle the seating forms visibility since the seating section has been created.
             this.showAddSeatForm = false;
