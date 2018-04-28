@@ -1079,8 +1079,12 @@ var vm = new Vue({
         bus.$on('sigMakeGeneral', (posX, posY, sizeX, sizeY, name, color, price)=>{
             this.makeGeneral(posX, posY, sizeX, sizeY, name, color, price);
         });
-        bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name, price)=>{
-            this.makeTable(posX, posY, type, seats, xSeats, ySeats, name, price);
+        bus.$on('sigMakeTable', (posX, posY, type, seats, xSeats, ySeats, name, seatingType, price)=>{
+            console.log("On Sig Make Table:");
+            console.log("name"+ name);
+            console.log("price"+price);
+
+            this.makeTable(posX, posY, type, seats, xSeats, ySeats, name, seatingType, price);
         });
         // loads a canvas instance from the data store in seat-map.json
         $.getJSON("./seat-map.json", function (data) {
