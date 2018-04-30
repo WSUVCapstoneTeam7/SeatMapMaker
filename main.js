@@ -697,20 +697,22 @@ var vm = new Vue({
 
         editSeating:function() {
             var selectedGroup = fabCanvas.getActiveObject();
-            editGroup = selectedGroup.getObjects();
-            selectedGroup._restoreObjectsState();
-            fabCanvas.remove(selectedGroup);
-            
-            for (var i = 0; i < editGroup.length; i++) {   
-                fabCanvas.add(editGroup[i]);
-                editGroup[i].dirty = true;
-                editGroup[i].lockMovementX = true;
-                editGroup[i].lockMovementY = true;
-                fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+            if (selectedGroup != null){
+                editGroup = selectedGroup.getObjects();
+                selectedGroup._restoreObjectsState();
+                fabCanvas.remove(selectedGroup);
+                
+                for (var i = 0; i < editGroup.length; i++) {   
+                    fabCanvas.add(editGroup[i]);
+                    editGroup[i].dirty = true;
+                    editGroup[i].lockMovementX = true;
+                    editGroup[i].lockMovementY = true;
+                    fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+                }
+                // if you have disabled render on addition
+                fabCanvas.renderAll();
+                seatEditing = true;
             }
-            // if you have disabled render on addition
-            fabCanvas.renderAll();
-            seatEditing = true;
         },
 
         // removes the currently selected Seat Selection from the fabCanvas.
