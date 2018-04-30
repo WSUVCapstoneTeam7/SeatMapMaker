@@ -296,20 +296,23 @@ Vue.component('edit-form', {
             //console.log(fabCanvas.getActiveObject())
 
             var selectedGroup = fabCanvas.getActiveObject();
-            editGroup = selected.getObjects();
-            selectedGroup._restoreObjectsState();
-            fabCanvas.remove(selectedGroup);
-            
-            for (var i = 0; i < editGroup.length; i++) {   
-                fabCanvas.add(editGroup[i]);
-                editGroup[i].dirty = true;
-                editGroup[i].lockMovementX = true;
-                editGroup[i].lockMovementY = true;
-                fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+            // console.log(selectedGroup);
+            if(selectedGroup != null){
+                editGroup = selectedGroup.getObjects();
+                selectedGroup._restoreObjectsState();
+                fabCanvas.remove(selectedGroup);
+                
+                for (var i = 0; i < editGroup.length; i++) {   
+                    fabCanvas.add(editGroup[i]);
+                    editGroup[i].dirty = true;
+                    editGroup[i].lockMovementX = true;
+                    editGroup[i].lockMovementY = true;
+                    fabCanvas.item(fabCanvas.size()-1).hasControls = false;
+                }
+                // if you have disabled render on addition
+                fabCanvas.renderAll();
+                seatEditing = true;
             }
-            // if you have disabled render on addition
-            fabCanvas.renderAll();
-            seatEditing = true;
         },
         regroupEdit(){
             //console.log(editGroup);
@@ -694,7 +697,7 @@ var vm = new Vue({
 
         editSeating:function() {
             var selectedGroup = fabCanvas.getActiveObject();
-            editGroup = selectedgroup.getObjects();
+            editGroup = selectedGroup.getObjects();
             selectedGroup._restoreObjectsState();
             fabCanvas.remove(selectedGroup);
             
@@ -880,7 +883,14 @@ var vm = new Vue({
             });
             // set text groupId
             text.groupId = this.groupIdCounter;
-
+            // set the seatType color
+            var color = "green";
+            if (seatType == "VIP")
+                color = "green";
+            else if (seatType == "Normal")
+                color = "yellow";
+            else if (seatType == "Economy")
+                color = "blue";
             if (type == 'rect') {
 
                 // calculate height and width of table
@@ -937,7 +947,7 @@ var vm = new Vue({
                     for (var i = 0; i < xSeats; i++) {
                         var circleT = new fabric.Circle({
                             radius: rad, 
-                            fill: 'green', 
+                            fill: color, 
                             left: leftStart + dia*i + gap*i, 
                             top: topPos,
                             originX: 'center',
@@ -945,7 +955,7 @@ var vm = new Vue({
                         });
                         var circleB = new fabric.Circle({
                             radius: rad, 
-                            fill: 'green', 
+                            fill: color, 
                             left: leftStart + dia*i + gap*i, 
                             top: bottomPos,
                             originX: 'center',
@@ -976,7 +986,7 @@ var vm = new Vue({
                     for (var i = 0; i < ySeats; i++) {
                         var circleL = new fabric.Circle({
                             radius: rad, 
-                            fill: 'green', 
+                            fill: color, 
                             left: leftPos,
                             top: topStart + dia*i + gap*i,
                             originX: 'center',
@@ -984,7 +994,7 @@ var vm = new Vue({
                         });
                         var circleR = new fabric.Circle({
                             radius: rad,
-                            fill: 'green', 
+                            fill: color, 
                             left: rightPos,
                             top: topStart + dia*i + gap*i,
                             originX: 'center',
@@ -1059,7 +1069,7 @@ var vm = new Vue({
 
                     var circle = new fabric.Circle({
                         radius: rad, 
-                        fill: 'green', 
+                        fill: color, 
                         left: xPos,
                         top: yPos,
                         originX: 'center',
