@@ -128,6 +128,7 @@ fabric.Circle.prototype.toObject = (function(toObject){
             price: this.price,
             groupId: this.groupId,
             seatType: this.seatType,
+            deleted: this.deleted
         });
     };
 })(fabric.Circle.prototype.toObject);
@@ -311,13 +312,25 @@ Vue.component('edit-form', {
             // }
         },
         removeSelectedSeat(){
-            if(seatEditing){
-                var seat = fabCanvas.getActiveObject()
+            var seat = fabCanvas.getActiveObject()
+            if(seatEditing && !seat.deleted){
                 //console.log(seat)
                 seat.fill = 'transparent';
                 seat.stroke = 'gray';
                 seat.dirty = true;
+                seat.deleted = true;
                 //console.log(seat)
+            } else if(seatEditing && seat.deleted){
+                if (seat.type == "VIP")
+                    color = "green";
+                else if (seat.type == "Normal")
+                    color = "yellow";
+                else if (seat.type == "Economy")
+                    color = "red";
+                seat.color = color;
+                seat.stroke = 'transparent';
+                seat.dirty = true;
+                seat.deleted = false;
             }
             fabCanvas.renderAll();
         }
@@ -595,6 +608,7 @@ var vm = new Vue({
                     // set circle seatType
                     circle.seatType = type;
                     // add price property to circle
+                    circle.deleted = false;
                     this.addPriceToObject(circle,price);
 
                     items.push(circle);
