@@ -19,5 +19,4 @@ The prototype is a javascript frontend written using the VueJS component library
 
 Step one may be completed also by way of the following method:
 1. Clone [Seat Map Maker Repository](https://github.com/WSUVCapstoneTeam7/SeatMapMaker).
-2. Host the tool on a server
-* Alternatively with an appliction like [Live Server for VSCode](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
+2. Host the tool on a server same as the viewer.
