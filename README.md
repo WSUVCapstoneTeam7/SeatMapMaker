@@ -2,7 +2,7 @@
 ## Capstone Team7
 ### Dennis Vargas, Amy Phillips, Tyler Petty, Vannessa Farmer, Christopher Feener
 
-[![GitHub (pre-)release](https://img.shields.io/github/release/phase2/particle/all.svg)](https://github.com/WSUVCapstoneTeam7/SeatMapMaker)
+[![GitHub (pre-)release](https://img.shields.io/github/release/phase2/particle/all.svg)](https://github.com/WSUVCapstoneTeam7/SeatMapMaker/releases)
 
 ## Description:
 A stand alone tool which lets the user make a seating chart. This tool can be imported into ticket selling projects such as pretix and any like it. 
