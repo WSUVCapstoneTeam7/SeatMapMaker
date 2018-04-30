@@ -130,7 +130,7 @@ fabric.Circle.prototype.toObject = (function(toObject){
             groupId: this.groupId,
             rowName: this.rowName,
             colName: this.colName,
-            deleted: this.deleted
+            deleted: this.deleted,
             seatType: this.seatType,
         });
     };
