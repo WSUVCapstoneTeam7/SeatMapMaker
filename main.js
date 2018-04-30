@@ -194,7 +194,7 @@ Vue.component('add-form',{
             // emit a Make Seating bus signal; or place a passenger on the bus carrying the
             // parameters to make a seating section. This package will get off at
             // the bus.$on (bus stop) and get routed to where it should be delivered.
-            console.log(this.sectionType)
+            // console.log(this.sectionType);
             if(this.sectionType=="Seating")
                 bus.$emit('sigMakeSeating',startX,startY,this.columns, this.rows, this.sectionName, this.seatingType, this.colStart, this.rowStart, parseInt(this.price));
             else if(this.sectionType=="Table")
@@ -277,8 +277,8 @@ Vue.component('edit-form', {
             if (fabCanvas.getActiveObject() != null) {
                 var coords = fabCanvas.getActiveObject().calcCoords();
                 var object = fabCanvas.getActiveObject();
-                console.log("section Name Edit");
-                console.log(object);
+                // console.log("section Name Edit");
+                // console.log(object);
                 // &&(object.sectionType == "seating")
                 vm.deleteSeating();
                 if((this.sectionType=="Seating")){
@@ -296,7 +296,7 @@ Vue.component('edit-form', {
             //console.log(fabCanvas.getActiveObject())
 
             var selectedGroup = fabCanvas.getActiveObject();
-            editGroup = selectedgroupObjects;
+            editGroup = selected.getObjects();
             selectedGroup._restoreObjectsState();
             fabCanvas.remove(selectedGroup);
             
@@ -348,7 +348,7 @@ Vue.component('edit-form', {
                 else if (seat.type == "Normal")
                     color = "yellow";
                 else if (seat.type == "Economy")
-                    color = "red";
+                    color = "blue";
                 seat.color = color;
                 seat.stroke = 'transparent';
                 seat.dirty = true;
@@ -633,7 +633,7 @@ var vm = new Vue({
             else if (type == "Normal")
                 color = "yellow";
             else if (type == "Economy")
-                color = "red";
+                color = "blue";
             for (var i = 0; i < rows; i++) {
                 for (var j = 0; j < cols; j++) {
                     // console.log("adding circle");
@@ -694,7 +694,7 @@ var vm = new Vue({
 
         editSeating:function() {
             var selectedGroup = fabCanvas.getActiveObject();
-            editGroup = selectedgroupObjects;
+            editGroup = selectedgroup.getObjects();
             selectedGroup._restoreObjectsState();
             fabCanvas.remove(selectedGroup);
             
@@ -784,7 +784,7 @@ var vm = new Vue({
             var groupItems = [];
             var ungroup = function (group) {
                 // console.log("in ungroup()");
-                groupItems = groupObjects;
+                groupItems = group.getObjects();
                 group._restoreObjectsState();
 
 
