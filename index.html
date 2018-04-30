@@ -142,7 +142,7 @@
             <form>
                 <!-- v-model directive binds data from field to data in Vue instance -->
                 Name: <input type="text" id="editName" value="Test Name" v-model ="sectionName" placeholder="Section Name"><br>
-                Price: <input type="number" id="newPrice" style="width: 100"><br>
+                Price: <input type="number" id="newPrice" style="width: 100" v-model="price"><br>
                 <!--<p>Seating Type</p><br>-->
                 Section Type: <form>
                     <input type="radio" name="SectionType" value="Seating" v-model = "sectionType"> Seating
