@@ -1,6 +1,6 @@
 # SeatMapMaker
 ## Capstone Team7
-### Dennis Vargas, Amy Phillips, Tyler Petty, Vannessa Farmer, Christopher Feener
+### Dennis Vargas, Amy Phillips, Tyler Petty, Vannesa Farmer, Christopher Feener
 
 [Release: Version 1](https://github.com/WSUVCapstoneTeam7/SeatMapMaker/releases/latest)
 
